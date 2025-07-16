@@ -21,12 +21,12 @@ export default function SearchPage() {
 
     try {
       const response = await fetch(
-        `https://openlibrary.org/search.json?q=${query}&limit=10`
+        `https://openlibrary.org/search.json?q=${query}&limit=10`,
       );
       const data = await response.json();
+
       setBooks(data.docs);
       setHasSearched(true);
-      console.log(data.docs);
     } catch (error) {
       console.error("Fetch error:", error);
     } finally {
@@ -38,19 +38,19 @@ export default function SearchPage() {
     <div className="w-full min-h-screen p-6 mx-auto max-w-5xl">
       <Form className="w-full flex flex-row gap-4" onSubmit={handleSearch}>
         <Input
+          isDisabled={loading}
           placeholder="Search for a book"
           size="lg"
           value={searchText}
           variant="bordered"
           onValueChange={setSearchText}
-          isDisabled={loading}
         />
         <Button
           className="font-bold"
           color="primary"
+          isDisabled={loading}
           size="lg"
           type="submit"
-          isDisabled={loading}
         >
           {loading ? "Searching..." : "Search"}
         </Button>
