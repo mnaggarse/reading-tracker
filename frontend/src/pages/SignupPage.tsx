@@ -13,24 +13,6 @@ export default function SignupPage() {
         </CardHeader>
         <CardBody>
           <Form className="gap-4">
-            <div className="flex gap-4">
-              <Input
-                label="First name"
-                labelPlacement="outside-top"
-                placeholder="John"
-                size="lg"
-                type="text"
-                variant="bordered"
-              />
-              <Input
-                label="Last name"
-                labelPlacement="outside-top"
-                placeholder="Doe"
-                size="lg"
-                type="text"
-                variant="bordered"
-              />
-            </div>
             <Input
               label="Email"
               labelPlacement="outside-top"
