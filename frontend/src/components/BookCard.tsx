@@ -12,8 +12,8 @@ export function BookCard({ book }) {
       className="cursor-pointer"
       isDisabled={progress === 100}
     >
-      <CardHeader className="w-full">
-        <Image className="object-cover w-full" src={book.cover} />
+      <CardHeader>
+        <Image src={book.cover} width={500} />
       </CardHeader>
       <CardBody className="pt-0">
         <h2 className="text-lg font-bold">{book.title}</h2>
