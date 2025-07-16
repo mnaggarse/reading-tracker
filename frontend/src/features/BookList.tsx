@@ -21,9 +21,11 @@ export default function BookList() {
   }, []);
 
   return (
-    <div className="p-6 mx-auto max-w-5xl grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8">
+    <div className="p-6 mx-auto max-w-5xl columns-2 md:columns-3 lg:columns-4 gap-4 md:gap-8">
       {books.map((book) => (
-        <BookCard key={book.id} book={book} />
+        <div key={book.id} className="mb-4">
+          <BookCard book={book} />
+        </div>
       ))}
     </div>
   );
