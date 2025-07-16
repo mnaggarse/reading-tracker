@@ -71,7 +71,7 @@ export default function LoginPage() {
               Continue with Google
             </Button>
             <div className="w-full flex items-center justify-center gap-1">
-              <p>Don't have an account?</p>
+              <p>Don&apos;t have an account?</p>
               <Link className="text-blue-600 font-bold" to="/signup">
                 signup
               </Link>
