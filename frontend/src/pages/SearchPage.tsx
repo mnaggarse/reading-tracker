@@ -3,7 +3,7 @@ import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Form } from "@heroui/form";
 import { Image } from "@heroui/image";
 import { Input } from "@heroui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import supabase from "@/utils/supabase";
@@ -12,8 +12,30 @@ export default function SearchPage() {
   const [searchText, setSearchText] = useState("");
   const [books, setBooks] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
-  const [loading, setLoading] = useState(false); // 👈
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+
+      if (error) {
+        console.error("Error getting user:", error);
+      }
+      setUser(data?.user ?? null);
+      setLoadingUser(false);
+    };
+
+    getUser();
+  }, []);
+
+  useEffect(() => {
+    if (!loadingUser && user === null) {
+      navigate("/login");
+    }
+  }, [loadingUser, user]);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -40,6 +62,11 @@ export default function SearchPage() {
   };
 
   const handleAdd = async (book) => {
+    if (!user) {
+      alert("You must be logged in to add a book.");
+      return;
+    }
+
     const { data, error } = await supabase
       .from("books")
       .insert({
@@ -48,7 +75,7 @@ export default function SearchPage() {
         cover: book.cover_i
           ? `http://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`
           : "https://placehold.co/300x400?text=Cover",
-        user_id: 1, // Replace with actual user ID from context or state
+        user_id: user.id,
       })
       .select();
 
@@ -61,7 +88,7 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="w-full min-h-screen p-6 mx-auto max-w-5xl">
+    <div className="w-full min-h-screen pt-12 p-6 mx-auto max-w-5xl">
       <Form className="w-full flex flex-row gap-4" onSubmit={handleSearch}>
         <Input
           isDisabled={loading}
@@ -105,7 +132,11 @@ export default function SearchPage() {
           >
             <CardHeader>
               <Image
-                src={`http://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`}
+                src={
+                  book.cover_i
+                    ? `http://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`
+                    : "https://placehold.co/300x400?text=No+Cover"
+                }
                 width={500}
               />
             </CardHeader>
