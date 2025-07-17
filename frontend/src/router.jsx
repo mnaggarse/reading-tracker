@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute";
+import PublicRoute from "./components/PublicRoute";
 import AddBookPage from "./pages/AddBookPage";
 import Error404Page from "./pages/Error404Page";
 import HomePage from "./pages/HomePage";
@@ -32,9 +33,23 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
   },
-  { path: "/signup", element: <SignupPage /> },
-  { path: "/login", element: <LoginPage /> },
-  { path: "*", element: <Error404Page /> }, // Fallback for unmatched routes
+  {
+    path: "/signup",
+    element: (
+      <PublicRoute>
+        <SignupPage />
+      </PublicRoute>
+    ),
+  },
+  {
+    path: "/login",
+    element: (
+      <PublicRoute>
+        <LoginPage />
+      </PublicRoute>
+    ),
+  },
+  { path: "*", element: <Error404Page /> },
 ]);
 
 export default router;
