@@ -5,12 +5,10 @@ const PublicRoute = ({ children }) => {
   const { session } = UserAuth();
 
   if (session) {
-    return <div>Loading...</div>;
+    return <Navigate to="/" />;
   }
 
-  return (
-    <div>{session ? <>{children}</> : <Navigate to="/" />}</div>
-  );
+  return children;
 };
 
 export default PublicRoute;

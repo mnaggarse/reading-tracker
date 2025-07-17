@@ -4,11 +4,11 @@ import { UserAuth } from "../context/AuthContext";
 const PrivateRoute = ({ children }) => {
   const { session } = UserAuth();
 
-  if (session === undefined) {
-    return <div>Loading...</div>;
+  if (!session) {
+    return <Navigate to="/login" replace />;
   }
 
-  return <div>{session ? <>{children}</> : <Navigate to="/login" />}</div>;
+  return children;
 };
 
 export default PrivateRoute;
