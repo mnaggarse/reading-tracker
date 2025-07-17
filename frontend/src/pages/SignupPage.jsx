@@ -1,14 +1,38 @@
-import { Button } from "@heroui/button";
-import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Form } from "@heroui/form";
-import { Input } from "@heroui/input";
+import { Button, Card, CardBody, CardHeader, Form, Input } from "@heroui/react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GoogleIcon } from "../components/icons";
+import { UserAuth } from "../context/AuthContext";
 
-export default function SignupPage() {
+const SignupPage = () => {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const { signup } = UserAuth();
+  const navigate = useNavigate();
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const result = await signup({ username, email, password });
+
+      if (result.success) {
+        navigate("/");
+      } else {
+        setError(result.error.message);
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.");
+      console.error("Signup error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="p-6 h-screen overflow-hidden flex items-center justify-center">
@@ -18,7 +42,19 @@ export default function SignupPage() {
         </CardHeader>
 
         <CardBody>
-          <Form className="gap-4">
+          <Form onSubmit={handleSignup} className="gap-4">
+            <Input
+              required
+              type="text"
+              label="Name"
+              size="lg"
+              variant="bordered"
+              placeholder="John Doe"
+              labelPlacement="outside-top"
+              value={username}
+              onValueChange={setUsername}
+            />
+
             <Input
               required
               type="email"
@@ -45,19 +81,20 @@ export default function SignupPage() {
 
             <Button
               fullWidth
-              className="mt-2 font-bold"
-              color="primary"
-              size="lg"
+              isDisabled={loading}
               type="submit"
+              size="lg"
+              color="primary"
+              className="mt-2 font-bold"
             >
               Create account
             </Button>
 
             <Button
               fullWidth
-              className="font-bold"
               size="lg"
               variant="bordered"
+              className="font-bold"
             >
               <GoogleIcon />
               Continue with Google
@@ -70,9 +107,15 @@ export default function SignupPage() {
                 login
               </Link>
             </div>
+
+            {error && (
+              <p className="text-red-600 mx-auto text-center">{error}</p>
+            )}
           </Form>
         </CardBody>
       </Card>
     </div>
   );
-}
+};
+
+export default SignupPage;
