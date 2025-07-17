@@ -1,4 +1,4 @@
-import { Card, CardBody, CardHeader, Progress } from "@heroui/react";
+import { Card, CardBody, CardHeader, Image, Progress } from "@heroui/react";
 
 const BookCard = ({ book }) => {
   const progress = (book.read / book.pages) * 100;
