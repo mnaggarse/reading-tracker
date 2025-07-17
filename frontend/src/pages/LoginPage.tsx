@@ -3,13 +3,14 @@ import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Form } from "@heroui/form";
 import { Input } from "@heroui/input";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import supabase from "@/utils/supabase";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   interface LoginFormEvent extends React.FormEvent<HTMLFormElement> {}
 
@@ -26,6 +27,8 @@ export default function LoginPage() {
     });
 
     if (error) throw error;
+
+    navigate("/");
 
     return { data, error };
   };
