@@ -24,7 +24,7 @@ export default function AddButton() {
       <DropdownTrigger>
         <Button
           isIconOnly
-          className="fixed bottom-20 right-8 z-50"
+          className="opacity-20 hover:opacity-100 fixed bottom-20 right-8 z-50"
           color="primary"
           radius="full"
           size="lg"
