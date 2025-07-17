@@ -1,5 +1,8 @@
 import { Button, Card, CardBody, CardHeader, Form, Input } from "@heroui/react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserAuth } from "../context/AuthContext";
+import supabase from "../utils/supabase";
 
 const AddBookPage = () => {
   const [book, setBook] = useState({
@@ -9,11 +12,32 @@ const AddBookPage = () => {
     cover: "",
   });
 
-  function handleInputChange(e) {
+  const navigate = useNavigate();
+  const { session } = UserAuth();
+
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setBook((prev) => ({ ...prev, [name]: value }));
-    console.log(book);
-  }
+  };
+
+  const handleAdd = async (e) => {
+    e.preventDefault();
+
+    const { error } = await supabase.from("books").insert({
+      ...book,
+      cover: book.cover
+        ? book.cover
+        : "https://placehold.co/200x300?text=No+Cover",
+      pages: book.pages ? book.pages : 0,
+      user_id: session.user.id,
+    });
+
+    if (error) {
+      console.error("Error adding book:", error);
+    } else {
+      navigate("/");
+    }
+  };
 
   return (
     <div className="p-6 h-screen overflow-hidden flex items-center justify-center">
@@ -23,7 +47,7 @@ const AddBookPage = () => {
         </CardHeader>
 
         <CardBody>
-          <Form className="gap-4">
+          <Form className="gap-4" onSubmit={handleAdd}>
             <Input
               required
               type="text"
@@ -67,7 +91,7 @@ const AddBookPage = () => {
               label="Cover Link"
               size="lg"
               variant="bordered"
-              placeholder="https://placehold.co/300x400?text=No+Cover"
+              placeholder="https://placehold.co/200x300?text=No+Cover"
               labelPlacement="outside-top"
               value={book.cover}
               onChange={handleInputChange}
@@ -75,10 +99,10 @@ const AddBookPage = () => {
 
             <Button
               fullWidth
-              className="mt-2 font-bold"
-              color="primary"
-              size="lg"
               type="submit"
+              size="lg"
+              color="primary"
+              className="mt-2 font-bold"
             >
               Add
             </Button>
