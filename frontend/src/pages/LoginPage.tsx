@@ -2,9 +2,26 @@ import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Form } from "@heroui/form";
 import { Input } from "@heroui/input";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
+import supabase from "@/utils/supabase";
+
 export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) throw error;
+
+    return data;
+  };
+
   return (
     <div className="p-6 h-screen overflow-hidden flex items-center justify-center">
       <Card className="p-4 w-full max-w-lg">
@@ -19,7 +36,9 @@ export default function LoginPage() {
               placeholder="johndoe@gmail.com"
               size="lg"
               type="email"
+              value={email}
               variant="bordered"
+              onValueChange={setEmail}
             />
             <Input
               label="Password"
@@ -27,13 +46,16 @@ export default function LoginPage() {
               placeholder="jo******"
               size="lg"
               type="password"
+              value={password}
               variant="bordered"
+              onValueChange={setPassword}
             />
             <Button
               fullWidth
               className="mx-auto mt-2 font-bold"
               color="primary"
               size="lg"
+              onPress={handleLogin}
             >
               Login
             </Button>
