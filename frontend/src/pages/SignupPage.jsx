@@ -87,7 +87,7 @@ const SignupPage = () => {
               color="primary"
               className="mt-2 font-bold"
             >
-              Create account
+              {loading ? "Please wait..." : "Create account"}
             </Button>
 
             <Button

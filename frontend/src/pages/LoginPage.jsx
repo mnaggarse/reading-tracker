@@ -74,7 +74,7 @@ const LoginPage = () => {
               color="primary"
               className="mt-2 font-bold"
             >
-              Login
+              {loading ? "Please wait..." : "Login"}
             </Button>
 
             <Button
