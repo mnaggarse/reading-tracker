@@ -8,7 +8,7 @@ import {
 import { Edit, Plus, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-export default function AddButton() {
+const AddButton = () => {
   const navigate = useNavigate();
 
   return (
@@ -44,4 +44,6 @@ export default function AddButton() {
       </DropdownMenu>
     </Dropdown>
   );
-}
+};
+
+export default AddButton;

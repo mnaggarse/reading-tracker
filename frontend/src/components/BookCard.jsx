@@ -1,6 +1,6 @@
 import { Card, CardBody, CardHeader, Progress } from "@heroui/react";
 
-export default function BookCard({ book }) {
+const BookCard = ({ book }) => {
   const progress = (book.read / book.pages) * 100;
   return (
     <Card
@@ -26,4 +26,6 @@ export default function BookCard({ book }) {
       </CardBody>
     </Card>
   );
-}
+};
+
+export default BookCard;

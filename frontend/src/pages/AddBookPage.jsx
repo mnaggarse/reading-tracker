@@ -1,7 +1,7 @@
 import { Button, Card, CardBody, CardHeader, Form, Input } from "@heroui/react";
 import { useState } from "react";
 
-export default function AddBookPage() {
+const AddBookPage = () => {
   const [book, setBook] = useState({
     title: "",
     author: "",
@@ -87,4 +87,6 @@ export default function AddBookPage() {
       </Card>
     </div>
   );
-}
+};
+
+export default AddBookPage;

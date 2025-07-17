@@ -4,8 +4,8 @@ import AddButton from "../components/AddButton";
 import BookCard from "../components/BookCard";
 import Nav from "../components/Nav";
 
-export default function HomePage() {
-  const [books, setBooks] = useState([]);
+const HomePage = () => {
+  const [books, _setBooks] = useState([]);
 
   return (
     <>
@@ -20,4 +20,6 @@ export default function HomePage() {
       <AddButton />
     </>
   );
-}
+};
+
+export default HomePage;
