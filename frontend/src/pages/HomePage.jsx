@@ -1,11 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import AddButton from "../components/AddButton";
 import BookCard from "../components/BookCard";
 import Nav from "../components/Nav";
+import { UserAuth } from "../context/AuthContext";
+import supabase from "../utils/supabase";
 
 const HomePage = () => {
-  const [books, _setBooks] = useState([]);
+  const { session } = UserAuth();
+  const [books, setBooks] = useState([]);
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      const { data, error } = await supabase
+        .from("books")
+        .select("*")
+        .eq("user_id", session.user.id);
+
+      if (error) {
+        console.error("Error fetching books:", error);
+      } else {
+        setBooks(data);
+      }
+    };
+
+    fetchBooks();
+  }, [session]);
 
   return (
     <>
