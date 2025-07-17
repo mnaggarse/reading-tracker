@@ -1,11 +1,12 @@
 import { Card, CardBody, CardHeader, Image, Progress } from "@heroui/react";
 
-const BookCard = ({ book }) => {
+const BookCard = ({ book, onPress }) => {
   const progress = (book.read / book.pages) * 100;
   return (
     <Card
       fullWidth
       isPressable
+      onPress={onPress}
       className="cursor-pointer mb-4"
       isDisabled={progress === 100}
     >
