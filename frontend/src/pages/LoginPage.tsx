@@ -11,7 +11,15 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async () => {
+  interface LoginFormEvent extends React.FormEvent<HTMLFormElement> {}
+
+  interface LoginResponse {
+    data: any;
+    error: Error | null;
+  }
+
+  const handleLogin = async (e: LoginFormEvent): Promise<LoginResponse> => {
+    e.preventDefault();
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -19,7 +27,7 @@ export default function LoginPage() {
 
     if (error) throw error;
 
-    return data;
+    return { data, error };
   };
 
   return (
@@ -29,8 +37,9 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold mb-4 mx-auto">Login</h1>
         </CardHeader>
         <CardBody>
-          <Form className="gap-4">
+          <Form className="gap-4" onSubmit={handleLogin}>
             <Input
+              required
               label="Email"
               labelPlacement="outside-top"
               placeholder="johndoe@gmail.com"
@@ -41,6 +50,7 @@ export default function LoginPage() {
               onValueChange={setEmail}
             />
             <Input
+              required
               label="Password"
               labelPlacement="outside-top"
               placeholder="jo******"
@@ -55,7 +65,7 @@ export default function LoginPage() {
               className="mx-auto mt-2 font-bold"
               color="primary"
               size="lg"
-              onPress={handleLogin}
+              type="submit"
             >
               Login
             </Button>

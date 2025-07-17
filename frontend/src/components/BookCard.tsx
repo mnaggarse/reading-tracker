@@ -2,7 +2,13 @@ import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Image } from "@heroui/image";
 import { Progress } from "@heroui/progress";
 
-export function BookCard({ book }) {
+import Book from "@/types/Book";
+
+interface BookCardProps {
+  book: Book;
+}
+
+export function BookCard({ book }: BookCardProps) {
   const progress = (book.read / book.pages) * 100;
 
   return (

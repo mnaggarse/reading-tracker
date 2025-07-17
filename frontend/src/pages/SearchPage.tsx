@@ -1,3 +1,5 @@
+import type { User } from "@supabase/supabase-js";
+
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Form } from "@heroui/form";
@@ -6,14 +8,16 @@ import { Input } from "@heroui/input";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import OpenLibraryBook from "@/types/OpenLibraryBook";
 import supabase from "@/utils/supabase";
 
 export default function SearchPage() {
   const [searchText, setSearchText] = useState("");
-  const [books, setBooks] = useState([]);
+
+  const [books, setBooks] = useState<OpenLibraryBook[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const navigate = useNavigate();
 
@@ -22,7 +26,10 @@ export default function SearchPage() {
       const { data, error } = await supabase.auth.getUser();
 
       if (error) {
-        console.error("Error getting user:", error);
+        setUser(null); // Don't throw, just treat as not logged in
+        setLoadingUser(false);
+
+        return;
       }
       setUser(data?.user ?? null);
       setLoadingUser(false);
@@ -35,9 +42,16 @@ export default function SearchPage() {
     if (!loadingUser && user === null) {
       navigate("/login");
     }
-  }, [loadingUser, user]);
+  }, [loadingUser, user, navigate]);
 
-  const handleSearch = async (e) => {
+  if (loadingUser || user === null) {
+    // Show nothing or a spinner while checking auth
+    return null;
+  }
+
+  interface SearchEvent extends React.FormEvent<HTMLFormElement> {}
+
+  const handleSearch = async (e: SearchEvent) => {
     e.preventDefault();
 
     const query = searchText.trim().replace(/\s+/g, "+").toLowerCase();
@@ -48,41 +62,41 @@ export default function SearchPage() {
 
     try {
       const response = await fetch(
-        `https://openlibrary.org/search.json?q=${query}&limit=10`
+        `https://openlibrary.org/search.json?q=${query}&limit=10`,
       );
       const data = await response.json();
 
       setBooks(data.docs);
       setHasSearched(true);
     } catch (error) {
-      console.error("Fetch error:", error);
+      throw new Error("Error fetching books: " + error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAdd = async (book) => {
+  const handleAdd = async (book: OpenLibraryBook) => {
     if (!user) {
       alert("You must be logged in to add a book.");
+
       return;
     }
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("books")
       .insert({
         title: book.title,
         author: book.author_name?.[0] || null,
         cover: book.cover_i
           ? `http://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`
-          : "https://placehold.co/300x400?text=Cover",
+          : "https://placehold.co/300x400?text=No+Cover",
         user_id: user.id,
       })
       .select();
 
     if (error) {
-      console.error("Error adding book:", error);
+      throw new Error("Error adding book: " + error.message);
     } else {
-      console.log("Book added successfully:", data);
       navigate("/");
     }
   };

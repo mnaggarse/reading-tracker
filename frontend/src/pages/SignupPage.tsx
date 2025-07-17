@@ -12,8 +12,19 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSignup = async () => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+  interface SignupResponse {
+    data: any;
+    error: Error | null;
+  }
+
+  interface SignupEvent extends React.FormEvent<HTMLFormElement> {}
+
+  const handleSignup = async (e: SignupEvent): Promise<any> => {
+    e.preventDefault();
+    const { data, error }: SignupResponse = await supabase.auth.signUp({
+      email,
+      password,
+    });
 
     if (error) throw error;
 
@@ -29,7 +40,7 @@ export default function SignupPage() {
           <h1 className="text-2xl font-bold mb-4 mx-auto">Signup</h1>
         </CardHeader>
         <CardBody>
-          <Form className="gap-4">
+          <Form className="gap-4" onSubmit={handleSignup}>
             <Input
               required
               label="Email"
@@ -58,7 +69,6 @@ export default function SignupPage() {
               color="primary"
               size="lg"
               type="submit"
-              onPress={handleSignup}
             >
               Create account
             </Button>

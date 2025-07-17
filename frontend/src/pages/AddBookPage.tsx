@@ -2,17 +2,18 @@ import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Form } from "@heroui/form";
 import { Input } from "@heroui/input";
+import { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import supabase from "@/utils/supabase";
-import { useNavigate } from "react-router-dom";
 
 export default function AddBookPage() {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
-  const [pages, setPages] = useState();
+  const [pages, setPages] = useState("");
   const [cover, setCover] = useState("");
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const navigate = useNavigate();
 
@@ -21,7 +22,10 @@ export default function AddBookPage() {
       const { data, error } = await supabase.auth.getUser();
 
       if (error) {
-        console.error("Error getting user:", error);
+        setUser(null);
+        setLoadingUser(false);
+
+        return;
       }
       setUser(data?.user ?? null);
       setLoadingUser(false);
@@ -34,7 +38,35 @@ export default function AddBookPage() {
     if (!loadingUser && user === null) {
       navigate("/login");
     }
-  }, [loadingUser, user]);
+  }, [loadingUser, user, navigate]);
+
+  if (loadingUser || user === null) {
+    // Show nothing or a spinner while checking auth
+    return null;
+  }
+
+  async function handleAdd(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!title.trim()) return;
+
+    const { error } = await supabase.from("books").insert([
+      {
+        title,
+        author,
+        pages: pages ? Number(pages) : 0,
+        cover,
+        user_id: user?.id,
+      },
+    ]);
+
+    if (error) {
+      alert("Failed to add book: " + error.message);
+
+      return;
+    }
+
+    navigate("/");
+  }
 
   return (
     <div className="p-6 h-screen overflow-hidden flex items-center justify-center">
@@ -78,11 +110,11 @@ export default function AddBookPage() {
             <Input
               label="Cover Link"
               labelPlacement="outside-top"
+              placeholder="https://placehold.co/300x400?text=No+Cover"
               size="lg"
               type="text"
               value={cover}
               variant="bordered"
-              placeholder="https://placehold.co/300x400?text=Cover"
               onValueChange={setCover}
             />
             <Button
