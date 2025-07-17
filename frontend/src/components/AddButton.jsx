@@ -1,30 +1,22 @@
-import { Button } from "@heroui/button";
 import {
+  Button,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-} from "@heroui/dropdown";
+} from "@heroui/react";
 import { Edit, Plus, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function AddButton() {
   const navigate = useNavigate();
 
-  const navigateToAddPage = () => {
-    navigate("/add");
-  };
-
-  const navigateToSearchPage = () => {
-    navigate("/search");
-  };
-
   return (
     <Dropdown>
       <DropdownTrigger>
         <Button
           isIconOnly
-          className="opacity-20 hover:opacity-100 fixed bottom-20 right-8 z-50"
+          className="opacity-20 hover:opacity-100 fixed bottom-10 right-8 z-50"
           color="primary"
           radius="full"
           size="lg"
@@ -32,18 +24,20 @@ export default function AddButton() {
           <Plus size={30} />
         </Button>
       </DropdownTrigger>
-      <DropdownMenu aria-label="Dropdown menu with icons" variant="faded">
+
+      <DropdownMenu variant="flat">
         <DropdownItem
           key="manual"
           startContent={<Edit />}
-          onPress={navigateToAddPage}
+          onPress={() => navigate("/add")}
         >
           Add manually
         </DropdownItem>
+
         <DropdownItem
           key="search"
           startContent={<Search />}
-          onPress={navigateToSearchPage}
+          onPress={() => navigate("/search")}
         >
           Search for a book
         </DropdownItem>

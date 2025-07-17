@@ -1,5 +1,4 @@
-import { Avatar } from "@heroui/avatar";
-import { Navbar, NavbarBrand, NavbarContent } from "@heroui/navbar";
+import { Avatar, Navbar, NavbarBrand, NavbarContent } from "@heroui/react";
 import { Settings } from "lucide-react";
 
 export default function Nav() {
@@ -8,6 +7,7 @@ export default function Nav() {
       <NavbarBrand>
         <Avatar className="cursor-pointer" name="MA" />
       </NavbarBrand>
+
       <NavbarContent justify="end">
         <Settings className="cursor-pointer" />
       </NavbarContent>

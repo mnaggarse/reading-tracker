@@ -1,5 +1,3 @@
-import type { User } from "@supabase/supabase-js";
-
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Form } from "@heroui/form";
@@ -8,15 +6,14 @@ import { Input } from "@heroui/input";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import OpenLibraryBook from "@/types/OpenLibraryBook";
-import supabase from "@/utils/supabase";
+import supabase from "../utils/supabase";
 
 export default function SearchPage() {
   const [searchText, setSearchText] = useState("");
 
-  const [books, setBooks] = useState<OpenLibraryBook[]>([]);
+  const [books, setBooks] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingUser, setLoadingUser] = useState(true);
   const navigate = useNavigate();
@@ -49,9 +46,7 @@ export default function SearchPage() {
     return null;
   }
 
-  interface SearchEvent extends React.FormEvent<HTMLFormElement> {}
-
-  const handleSearch = async (e: SearchEvent) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
 
     const query = searchText.trim().replace(/\s+/g, "+").toLowerCase();
@@ -62,7 +57,7 @@ export default function SearchPage() {
 
     try {
       const response = await fetch(
-        `https://openlibrary.org/search.json?q=${query}&limit=10`,
+        `https://openlibrary.org/search.json?q=${query}&limit=10`
       );
       const data = await response.json();
 
@@ -75,7 +70,7 @@ export default function SearchPage() {
     }
   };
 
-  const handleAdd = async (book: OpenLibraryBook) => {
+  const handleAdd = async (book) => {
     if (!user) {
       alert("You must be logged in to add a book.");
 
