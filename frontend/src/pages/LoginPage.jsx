@@ -1,7 +1,6 @@
 import { Button, Card, CardBody, CardHeader, Form, Input } from "@heroui/react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { GoogleIcon } from "../components/icons";
 import { UserAuth } from "../context/AuthContext";
 
 const LoginPage = () => {
@@ -77,7 +76,7 @@ const LoginPage = () => {
               {loading ? "Please wait..." : "Login"}
             </Button>
 
-            <Button
+            {/* <Button
               fullWidth
               size="lg"
               variant="bordered"
@@ -85,7 +84,7 @@ const LoginPage = () => {
             >
               <GoogleIcon />
               Continue with Google
-            </Button>
+            </Button> */}
 
             <div className="w-full flex items-center justify-center gap-1">
               <p>Don't have an account?</p>
