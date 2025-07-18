@@ -5,7 +5,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@heroui/react";
-import { Edit, Plus, Search } from "lucide-react";
+import { BookPlus, Edit, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const AddButton = () => {
@@ -14,24 +14,18 @@ const AddButton = () => {
   return (
     <Dropdown>
       <DropdownTrigger>
-        <Button
-          isIconOnly
-          className="opacity-20 hover:opacity-100 fixed bottom-10 right-8 z-50"
-          color="primary"
-          radius="full"
-          size="lg"
-        >
-          <Plus size={30} />
+        <Button color="primary" className="font-bold">
+          Add book
         </Button>
       </DropdownTrigger>
 
       <DropdownMenu variant="flat">
         <DropdownItem
           key="manual"
-          startContent={<Edit />}
+          startContent={<BookPlus />}
           onPress={() => navigate("/add")}
         >
-          Add manually
+          <p className="font-bold">Add manually</p>
         </DropdownItem>
 
         <DropdownItem
@@ -39,7 +33,7 @@ const AddButton = () => {
           startContent={<Search />}
           onPress={() => navigate("/search")}
         >
-          Search for a book
+          <p className="font-bold">Search for a book</p>
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
