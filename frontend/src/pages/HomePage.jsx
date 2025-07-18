@@ -11,7 +11,6 @@ import {
 } from "@heroui/react";
 import { Minus, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
-import AddButton from "../components/AddButton";
 import BookCard from "../components/BookCard";
 import Nav from "../components/Nav";
 import { UserAuth } from "../context/AuthContext";
@@ -250,8 +249,6 @@ const HomePage = () => {
           </ModalContent>
         </Modal>
       </div>
-
-      <AddButton />
     </>
   );
 };
