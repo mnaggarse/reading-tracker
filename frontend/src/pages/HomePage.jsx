@@ -60,7 +60,6 @@ const HomePage = () => {
         [name]: name === "pages" ? parseInt(value || 0, 10) : value,
       };
 
-      // Adjust slider if pages changed and readValue is greater than new pages
       if (name === "pages" && readValue > updated.pages) {
         setReadValue(updated.pages);
       }
@@ -75,7 +74,7 @@ const HomePage = () => {
     const updatedBook = {
       title: selectedBook.title,
       author: selectedBook.author,
-      pages: selectedBook.pages || 1, // default if empty
+      pages: selectedBook.pages || 1,
       cover: selectedBook.cover || "https://placehold.co/200x300?text=No+Cover",
       read: readValue,
     };
@@ -109,9 +108,19 @@ const HomePage = () => {
       <Nav />
 
       <div className="p-6 mx-auto max-w-5xl columns-2 md:columns-3 lg:columns-4 gap-4 md:gap-8">
-        {books.map((book, index) => (
-          <BookCard key={index} book={book} onPress={() => handlePress(book)} />
-        ))}
+        {books.length === 0 ? (
+          <p className="text-xl text-center absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]">
+            No books found. Click the "+" button to add your first book.
+          </p>
+        ) : (
+          books.map((book, index) => (
+            <BookCard
+              key={index}
+              book={book}
+              onPress={() => handlePress(book)}
+            />
+          ))
+        )}
 
         <Modal
           isOpen={isOpen}
