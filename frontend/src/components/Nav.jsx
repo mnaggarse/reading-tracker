@@ -1,11 +1,22 @@
-import { Button, Navbar, NavbarBrand, NavbarContent } from "@heroui/react";
+import {
+  Avatar,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Navbar,
+  NavbarBrand,
+  NavbarContent,
+} from "@heroui/react";
+import { LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { UserAuth } from "../context/AuthContext.jsx";
+import AddButton from "./AddButton.jsx";
 
 const Nav = () => {
   const navigate = useNavigate();
   const { session, signout } = UserAuth();
-  const name = session.user.user_metadata.username;
+  const username = session.user.user_metadata.username;
 
   const handleSignOut = async () => {
     try {
@@ -20,13 +31,25 @@ const Nav = () => {
   return (
     <Navbar className="bg-white border-b border-gray-200">
       <NavbarBrand>
-        <h1 className="text-lg font-bold">Welcome, {name}</h1>
+        <Dropdown>
+          <DropdownTrigger>
+            <Avatar name={username} className="cursor-pointer"></Avatar>
+          </DropdownTrigger>
+
+          <DropdownMenu variant="light" color="danger">
+            <DropdownItem
+              key="logout"
+              startContent={<LogOut className="text-red-500" />}
+              onPress={handleSignOut}
+            >
+              <p className="font-bold text-red-500">Logout</p>
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
       </NavbarBrand>
 
       <NavbarContent justify="end">
-        <Button variant="faded" color="danger" onPress={handleSignOut} className="font-semibold">
-          Sign out
-        </Button>
+        <AddButton />
       </NavbarContent>
     </Navbar>
   );
