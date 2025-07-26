@@ -1,5 +1,5 @@
 import { bookService } from "@/lib/database";
-import { Book, bookReadToBoolean } from "@/lib/database.types";
+import { Book } from "@/lib/database.types";
 import { useEffect, useState } from "react";
 
 export function useBooks() {
@@ -53,7 +53,7 @@ export function useBooks() {
       title: string;
       cover: string; // Required since we always provide a default value
       pages: number; // Required since we always provide a default value
-      read: boolean; // Required since we always provide a default value
+      read: number; // Page number (0 = unread, >0 = current page)
       rating: number; // Required since we always provide a default value
     }>
   ) => {
@@ -64,8 +64,8 @@ export function useBooks() {
       if (updates.title !== undefined) bookUpdate.title = updates.title;
       if (updates.cover !== undefined)
         bookUpdate.cover = updates.cover || "/placeholder.svg";
-      if (updates.pages !== undefined) bookUpdate.pages = updates.pages || 0;
-      if (updates.read !== undefined) bookUpdate.read = updates.read ? 1 : 0;
+      if (updates.pages !== undefined) bookUpdate.pages = updates.pages || 1;
+      if (updates.read !== undefined) bookUpdate.read = updates.read || 0;
       if (updates.rating !== undefined) bookUpdate.rating = updates.rating || 0;
 
       const updatedBook = await bookService.updateBook(bookId, bookUpdate);
@@ -107,7 +107,8 @@ export function useBooks() {
     const book = books.find((b) => b.id === bookId);
     if (!book) return false;
 
-    const newReadStatus = !bookReadToBoolean(book.read);
+    // If book is unread (read = 0), set to first page (1), otherwise set to unread (0)
+    const newReadStatus = book.read === 0 ? 1 : 0;
     const result = await updateBook(bookId, { read: newReadStatus });
     return result !== null;
   };
@@ -120,7 +121,25 @@ export function useBooks() {
 
   // Get books by status
   const getBooksByStatus = (read: boolean) => {
-    return books.filter((book) => bookReadToBoolean(book.read) === read);
+    return books.filter((book) => {
+      if (read) {
+        // Return books that have been read (read > 0)
+        return book.read > 0;
+      } else {
+        // Return books that are unread (read = 0)
+        return book.read === 0;
+      }
+    });
+  };
+
+  // Get completed books (100% progress)
+  const getCompletedBooks = () => {
+    return books.filter((book) => book.pages > 0 && book.read >= book.pages);
+  };
+
+  // Get in-progress books (started but not completed)
+  const getInProgressBooks = () => {
+    return books.filter((book) => book.read > 0 && book.read < book.pages);
   };
 
   // Get books by rating
@@ -128,8 +147,8 @@ export function useBooks() {
     return books.filter((book) => book.rating && book.rating >= minRating);
   };
 
-  // Get read books
-  const getReadBooks = () => getBooksByStatus(true);
+  // Get read books (legacy - now returns in-progress books)
+  const getReadBooks = () => getInProgressBooks();
 
   // Get unread books
   const getUnreadBooks = () => getBooksByStatus(false);
@@ -161,12 +180,16 @@ export function useBooks() {
     getBooksByRating,
     getReadBooks,
     getUnreadBooks,
+    getCompletedBooks,
+    getInProgressBooks,
     getHighlyRatedBooks,
 
     // Statistics
     totalBooks: books.length,
     readBooks: getReadBooks().length,
     unreadBooks: getUnreadBooks().length,
+    completedBooks: getCompletedBooks().length,
+    inProgressBooks: getInProgressBooks().length,
     averageRating:
       books.length > 0
         ? books.reduce((sum, book) => sum + (book.rating || 0), 0) /

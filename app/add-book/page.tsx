@@ -91,7 +91,7 @@ function AddBookContent() {
       const newBook = await addBook({
         title: book.volumeInfo.title,
         cover: book.volumeInfo.imageLinks?.thumbnail || "/placeholder.svg",
-        pages: book.volumeInfo.pageCount || 0,
+        pages: book.volumeInfo.pageCount || 1,
         read: false,
         rating: 0,
       });
@@ -131,7 +131,7 @@ function AddBookContent() {
       const newBook = await addBook({
         title: manualBook.title,
         cover: manualBook.cover || "/placeholder.svg",
-        pages: manualBook.pages ? parseInt(manualBook.pages) : 0,
+        pages: manualBook.pages ? parseInt(manualBook.pages) : 1,
         read: false,
         rating: 0,
       });

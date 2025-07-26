@@ -1,6 +1,8 @@
 "use client";
 
 import { BookCard } from "@/components/book-card";
+import { DeleteBookDialog } from "@/components/delete-book-dialog";
+import { EditBookModal } from "@/components/edit-book-modal";
 import { MobileNav } from "@/components/mobile-nav";
 import { ProtectedRoute } from "@/components/protected-route";
 import { Button } from "@/components/ui/button";
@@ -11,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { UpdateProgressModal } from "@/components/update-progress-modal";
 import { useBooks } from "@/hooks/use-books";
 import { useAuth } from "@/lib/auth-context";
 import { Book } from "@/lib/database.types";
@@ -26,20 +29,52 @@ function DashboardContent() {
     error,
     getReadBooks,
     getUnreadBooks,
+    getCompletedBooks,
+    getInProgressBooks,
     toggleReadStatus,
     updateRating,
+    updateBook,
     totalBooks,
     readBooks,
     unreadBooks,
+    completedBooks,
+    inProgressBooks,
+    deleteBook,
   } = useBooks();
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [isProgressModalOpen, setIsProgressModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [bookForAction, setBookForAction] = useState<Book | null>(null);
 
   const handleBookClick = (book: Book) => {
     setSelectedBook(book);
+    setIsProgressModalOpen(true);
   };
 
-  const handleToggleRead = async (book: Book) => {
-    await toggleReadStatus(book.id);
+  const handleEditBook = (book: Book) => {
+    setBookForAction(book);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteBook = (book: Book) => {
+    setBookForAction(book);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleProgressUpdate = async (bookId: string, newPage: number) => {
+    await updateBook(bookId, { read: newPage });
+  };
+
+  const handleEditSave = async (
+    bookId: string,
+    updates: { title: string; cover: string; pages: number; rating: number }
+  ) => {
+    await updateBook(bookId, updates);
+  };
+
+  const handleDeleteConfirm = async (bookId: string) => {
+    await deleteBook(bookId);
   };
 
   const handleSignOut = async () => {
@@ -47,7 +82,8 @@ function DashboardContent() {
   };
 
   // Organize books by reading status
-  const readBooksList = getReadBooks();
+  const completedBooksList = getCompletedBooks();
+  const inProgressBooksList = getInProgressBooks();
   const unreadBooksList = getUnreadBooks();
 
   const BookSection = ({
@@ -70,7 +106,8 @@ function DashboardContent() {
               key={book.id}
               book={book}
               onClick={() => handleBookClick(book)}
-              onToggleRead={() => handleToggleRead(book)}
+              onEdit={() => handleEditBook(book)}
+              onDelete={() => handleDeleteBook(book)}
             />
           ))}
         </div>
@@ -184,8 +221,9 @@ function DashboardContent() {
               My Reading List
             </h1>
             <p className="text-gray-600 mt-1">
-              Track your reading progress • {totalBooks} books • {readBooks}{" "}
-              read • {unreadBooks} to read
+              Track your reading progress • {totalBooks} books •{" "}
+              {completedBooks} completed • {inProgressBooks} in progress •{" "}
+              {unreadBooks} to read
             </p>
           </div>
           <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700">
@@ -215,9 +253,15 @@ function DashboardContent() {
         ) : (
           <>
             <BookSection
-              title="Read Books"
-              books={readBooksList}
+              title="Completed"
+              books={completedBooksList}
               emptyMessage="No books completed yet. Keep reading to see your achievements here!"
+            />
+
+            <BookSection
+              title="In Progress"
+              books={inProgressBooksList}
+              emptyMessage="No books in progress. Start reading to see your progress here!"
             />
 
             <BookSection
@@ -228,6 +272,39 @@ function DashboardContent() {
           </>
         )}
       </div>
+
+      {/* Progress Modal */}
+      <UpdateProgressModal
+        book={selectedBook}
+        isOpen={isProgressModalOpen}
+        onClose={() => {
+          setIsProgressModalOpen(false);
+          setSelectedBook(null);
+        }}
+        onUpdate={handleProgressUpdate}
+      />
+
+      {/* Edit Modal */}
+      <EditBookModal
+        book={bookForAction}
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setBookForAction(null);
+        }}
+        onSave={handleEditSave}
+      />
+
+      {/* Delete Dialog */}
+      <DeleteBookDialog
+        book={bookForAction}
+        isOpen={isDeleteDialogOpen}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setBookForAction(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 }

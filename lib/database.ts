@@ -162,7 +162,7 @@ export const bookService = {
     const newBook: BookInsert = {
       title: bookData.title,
       cover: bookData.cover || "/placeholder.svg", // Provide default cover image
-      pages: bookData.pages || 0, // Default to 0 pages
+      pages: bookData.pages || 1, // Default to 1 page
       read: bookData.read !== undefined ? booleanToBookRead(bookData.read) : 0, // Default to unread (0)
       rating: bookData.rating || 0, // Default to 0 rating
       user_id: user.id,
@@ -301,14 +301,14 @@ export const bookHelpers = {
   toInsertData(formData: {
     title: string;
     cover: string; // Required since we always provide a default value
-    pages: number; // Required since we always provide a default value
-    read: boolean; // Required since we always provide a default value
-    rating: number; // Required since we always provide a default value
+    pages?: number;
+    read?: boolean;
+    rating?: number;
   }) {
     return {
       title: formData.title,
       cover: formData.cover || "/placeholder.svg", // Provide default cover image
-      pages: formData.pages || 0, // Default to 0 pages
+      pages: formData.pages || 1, // Default to 1 page
       read: formData.read !== undefined ? booleanToBookRead(formData.read) : 0, // Default to unread (0)
       rating: formData.rating || 0, // Default to 0 rating
     };
