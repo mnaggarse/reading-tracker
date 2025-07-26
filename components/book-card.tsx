@@ -82,7 +82,7 @@ export function BookCard({ book, onClick, onEdit, onDelete }: BookCardProps) {
           </CardContent>
         </Card>
       </ContextMenuTrigger>
-      <ContextMenuContent className="rounded-xl">
+      <ContextMenuContent className="rounded-lg">
         <ContextMenuItem onClick={onEdit}>
           <Edit className="mr-2 h-4 w-4" />
           Edit Book

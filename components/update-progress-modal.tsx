@@ -99,7 +99,6 @@ export function UpdateProgressModal({
                   value={currentPage}
                   onChange={(e) => setCurrentPage(e.target.value)}
                   className="text-center rounded-xl"
-                  autoFocus
                 />
                 <Button
                   type="button"
