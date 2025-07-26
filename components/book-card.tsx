@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   ContextMenu,
@@ -8,8 +9,16 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Book } from "@/lib/database.types";
-import { CheckCircle, Edit, Trash2 } from "lucide-react";
+import { CheckCircle, Edit, MoreVertical, Trash2 } from "lucide-react";
 import Image from "next/image";
 
 interface BookCardProps {
@@ -20,67 +29,118 @@ interface BookCardProps {
 }
 
 export function BookCard({ book, onClick, onEdit, onDelete }: BookCardProps) {
+  const isMobile = useIsMobile();
   const isRead = book.read > 0;
   const isCompleted = book.pages > 0 && book.read >= book.pages;
   const progress = book.pages > 0 ? (book.read / book.pages) * 100 : 0;
 
+  const BookContent = () => (
+    <Card
+      className="select-none hover:shadow-lg transition-shadow duration-200 group rounded-xl cursor-pointer h-80 relative"
+      onClick={onClick}
+    >
+      <CardContent className="p-4 h-full flex flex-col">
+        <div className="relative mb-4 flex-shrink-0">
+          <div className="w-full h-48 bg-gray-100 rounded-md overflow-hidden">
+            <Image
+              src={book.cover || "/placeholder.svg"}
+              alt={book.title}
+              width={200}
+              height={300}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+            />
+          </div>
+          {isCompleted && (
+            <div className="absolute top-2 right-2">
+              <CheckCircle className="h-6 w-6 text-green-600 bg-white rounded-full" />
+            </div>
+          )}
+          {/* Floating Edit Button for Mobile */}
+          {isMobile && (
+            <div className="absolute top-2 left-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="p-2 bg-white/80 hover:bg-white shadow-md"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-40">
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit();
+                    }}
+                    className="font-bold cursor-pointer"
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit Book
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete();
+                    }}
+                    className="text-red-600 font-bold cursor-pointer"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Book
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
+        </div>
+
+        <div className="flex-1 flex flex-col">
+          <h3 className="font-semibold text-sm leading-tight line-clamp-2 text-center mb-3 flex-shrink-0">
+            {book.title}
+          </h3>
+
+          <div className="mt-auto">
+            {/* Pages and Percentage Row */}
+            {book.pages > 0 && (
+              <div className="flex justify-between items-center mb-2 text-xs text-gray-600">
+                <span>
+                  {book.read} / {book.pages} pages
+                </span>
+                <span>{Math.floor(progress)}%</span>
+              </div>
+            )}
+            {/* Progress Bar */}
+            {book.pages > 0 && (
+              <div className="flex items-center gap-2">
+                <div className="flex-1 bg-gray-200 rounded-full h-2">
+                  <div
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      isCompleted ? "bg-green-600" : "bg-blue-600"
+                    }`}
+                    style={{ width: `${Math.min(progress, 100)}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  // On mobile, show the card without context menu
+  if (isMobile) {
+    return <BookContent />;
+  }
+
+  // On desktop, show with context menu
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <Card
-          className="select-none hover:shadow-lg transition-shadow duration-200 group rounded-xl cursor-pointer h-80"
-          onClick={onClick}
-        >
-          <CardContent className="p-4 h-full flex flex-col">
-            <div className="relative mb-4 flex-shrink-0">
-              <div className="w-full h-48 bg-gray-100 rounded-md overflow-hidden">
-                <Image
-                  src={book.cover || "/placeholder.svg"}
-                  alt={book.title}
-                  width={200}
-                  height={300}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                />
-              </div>
-              {isCompleted && (
-                <div className="absolute top-2 right-2">
-                  <CheckCircle className="h-6 w-6 text-green-600 bg-white rounded-full" />
-                </div>
-              )}
-            </div>
-
-            <div className="flex-1 flex flex-col">
-              <h3 className="font-semibold text-sm leading-tight line-clamp-2 text-center mb-3 flex-shrink-0">
-                {book.title}
-              </h3>
-
-              <div className="mt-auto">
-                {/* Pages and Percentage Row */}
-                {book.pages > 0 && (
-                  <div className="flex justify-between items-center mb-2 text-xs text-gray-600">
-                    <span>
-                      {book.read} / {book.pages} pages
-                    </span>
-                    <span>{Math.floor(progress)}%</span>
-                  </div>
-                )}
-                {/* Progress Bar */}
-                {book.pages > 0 && (
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full transition-all duration-300 ${
-                          isCompleted ? "bg-green-600" : "bg-blue-600"
-                        }`}
-                        style={{ width: `${Math.min(progress, 100)}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <BookContent />
       </ContextMenuTrigger>
       <ContextMenuContent className="rounded-lg">
         <ContextMenuItem

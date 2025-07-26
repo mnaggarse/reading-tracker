@@ -46,7 +46,6 @@ export function DraggableBookSection({
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
-        delay: 100, // Add delay to prevent context menu on mobile
       },
     })
   );
