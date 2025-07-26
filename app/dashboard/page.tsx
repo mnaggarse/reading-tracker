@@ -2,6 +2,7 @@
 
 import { BookCard } from "@/components/book-card";
 import { DeleteBookDialog } from "@/components/delete-book-dialog";
+import { DraggableBookSection } from "@/components/draggable-book-section";
 import { EditBookModal } from "@/components/edit-book-modal";
 import { MobileNav } from "@/components/mobile-nav";
 import { ProtectedRoute } from "@/components/protected-route";
@@ -32,6 +33,8 @@ function DashboardContent() {
     completedBooks,
     inProgressBooks,
     deleteBook,
+    reorderBooks,
+    loadBooks,
   } = useBooks();
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isProgressModalOpen, setIsProgressModalOpen] = useState(false);
@@ -168,7 +171,10 @@ function DashboardContent() {
                   Profile
                 </Link>
               </Button>
-              <Button asChild className="font-bold gap-2 bg-blue-600 hover:bg-blue-700">
+              <Button
+                asChild
+                className="font-bold gap-2 bg-blue-600 hover:bg-blue-700"
+              >
                 <Link href="/add-book">
                   <Plus className="h-4 w-4" />
                   Add Book
@@ -211,22 +217,34 @@ function DashboardContent() {
           </div>
         ) : (
           <>
-            <BookSection
+            <DraggableBookSection
               title="Currently Reading"
               books={inProgressBooksList}
               emptyMessage="No books in progress. Start reading to see your progress here!"
+              onReorder={reorderBooks}
+              onClick={handleBookClick}
+              onEdit={handleEditBook}
+              onDelete={handleDeleteBook}
             />
 
-            <BookSection
+            <DraggableBookSection
               title="To Read"
               books={unreadBooksList}
               emptyMessage="No books waiting to be read. Add some books to your reading list!"
+              onReorder={reorderBooks}
+              onClick={handleBookClick}
+              onEdit={handleEditBook}
+              onDelete={handleDeleteBook}
             />
 
-            <BookSection
+            <DraggableBookSection
               title="Completed"
               books={completedBooksList}
               emptyMessage="No books completed yet. Keep reading to see your achievements here!"
+              onReorder={reorderBooks}
+              onClick={handleBookClick}
+              onEdit={handleEditBook}
+              onDelete={handleDeleteBook}
             />
           </>
         )}

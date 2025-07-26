@@ -107,6 +107,7 @@ export const bookService = {
       .from("books")
       .select("*")
       .eq("user_id", user.id)
+      .order("order", { ascending: true })
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -154,11 +155,25 @@ export const bookService = {
       return null;
     }
 
+    // Get the highest order number to place new book at the end
+    const { data: existingBooks } = await supabase
+      .from("books")
+      .select("order")
+      .eq("user_id", user.id)
+      .order("order", { ascending: false })
+      .limit(1);
+
+    const nextOrder =
+      existingBooks && existingBooks.length > 0
+        ? (existingBooks[0].order || 0) + 1
+        : 0;
+
     const newBook: BookInsert = {
       title: bookData.title,
       cover: bookData.cover || "/placeholder.svg", // Provide default cover image
       pages: bookData.pages || 1, // Default to 1 page
       read: bookData.read || 0, // Default to 0 pages read (unread)
+      order: nextOrder,
       user_id: user.id,
     };
 
@@ -225,6 +240,44 @@ export const bookService = {
     return this.updateBook(bookId, { read: read ? 1 : 0 });
   },
 
+  // Update book order for drag and drop
+  async updateBookOrder(
+    bookId: string,
+    newOrder: number
+  ): Promise<Book | null> {
+    return this.updateBook(bookId, { order: newOrder });
+  },
+
+  // Reorder multiple books (for drag and drop)
+  async reorderBooks(
+    bookOrders: { id: string; order: number }[]
+  ): Promise<boolean> {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return false;
+
+    try {
+      // Update each book's order
+      for (const { id, order } of bookOrders) {
+        const { error } = await supabase
+          .from("books")
+          .update({ order })
+          .eq("id", id)
+          .eq("user_id", user.id);
+
+        if (error) {
+          console.error("Error updating book order:", error);
+          return false;
+        }
+      }
+      return true;
+    } catch (error) {
+      console.error("Error reordering books:", error);
+      return false;
+    }
+  },
+
   // Get books by read status
   async getBooksByStatus(read: boolean): Promise<Book[]> {
     const {
@@ -237,6 +290,7 @@ export const bookService = {
       .select("*")
       .eq("user_id", user.id)
       .eq("read", read ? 1 : 0)
+      .order("order", { ascending: true })
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -274,4 +328,58 @@ export const bookHelpers = {
       read: formData.read || 0, // Default to 0 pages read (unread)
     };
   },
+};
+
+// Initialize order for existing books
+export const initializeBookOrders = async () => {
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return false;
+
+    // Get all books without order - use a different approach
+    const { data: allBooks, error: fetchError } = await supabase
+      .from("books")
+      .select("id, created_at, order")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: true });
+
+    if (fetchError) {
+      console.error("Error fetching books:", fetchError);
+      return false;
+    }
+
+    if (allBooks) {
+      // Filter books without order and update them
+      const booksWithoutOrder = allBooks.filter((book) => book.order === null);
+      
+      if (booksWithoutOrder.length > 0) {
+        // Get the highest existing order to continue from there
+        const booksWithOrder = allBooks.filter((book) => book.order !== null);
+        const maxOrder = booksWithOrder.length > 0 
+          ? Math.max(...booksWithOrder.map(book => book.order || 0))
+          : -1;
+        
+        // Update each book with an order based on creation date
+        for (let i = 0; i < booksWithoutOrder.length; i++) {
+          const { error: updateError } = await supabase
+            .from("books")
+            .update({ order: maxOrder + 1 + i })
+            .eq("id", booksWithoutOrder[i].id)
+            .eq("user_id", user.id);
+
+          if (updateError) {
+            console.error("Error updating book order:", updateError);
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error initializing book orders:", error);
+    return false;
+  }
 };

@@ -1,4 +1,4 @@
-import { bookService } from "@/lib/database";
+import { bookService, initializeBookOrders } from "@/lib/database";
 import { Book } from "@/lib/database.types";
 import { useEffect, useState } from "react";
 
@@ -13,7 +13,23 @@ export function useBooks() {
       setLoading(true);
       setError(null);
       const userBooks = await bookService.getUserBooks();
-      setBooks(userBooks);
+
+      // Initialize order for books that don't have it
+      if (userBooks.length > 0) {
+        const hasBooksWithoutOrder = userBooks.some(
+          (book) => book.order === null || book.order === undefined
+        );
+        if (hasBooksWithoutOrder) {
+          await initializeBookOrders();
+          // Reload books to get the updated order
+          const updatedBooks = await bookService.getUserBooks();
+          setBooks(updatedBooks);
+        } else {
+          setBooks(userBooks);
+        }
+      } else {
+        setBooks(userBooks);
+      }
     } catch (err) {
       setError("Failed to load books");
       console.error("Error loading books:", err);
@@ -128,6 +144,34 @@ export function useBooks() {
     return result !== null;
   };
 
+  // Reorder books for drag and drop
+  const reorderBooks = async (bookOrders: { id: string; order: number }[]) => {
+    try {
+      setError(null);
+      const success = await bookService.reorderBooks(bookOrders);
+
+      if (success) {
+        // Update local state with new order
+        const updatedBooks = [...books];
+        bookOrders.forEach(({ id, order }) => {
+          const bookIndex = updatedBooks.findIndex((book) => book.id === id);
+          if (bookIndex !== -1) {
+            updatedBooks[bookIndex] = { ...updatedBooks[bookIndex], order };
+          }
+        });
+        // Sort by order
+        updatedBooks.sort((a, b) => (a.order || 0) - (b.order || 0));
+        setBooks(updatedBooks);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      setError("Failed to reorder books");
+      console.error("Error reordering books:", err);
+      return false;
+    }
+  };
+
   // Get books by status
   const getBooksByStatus = (read: boolean) => {
     return books.filter((book) => {
@@ -175,6 +219,7 @@ export function useBooks() {
     deleteBook,
     deleteAllBooks,
     toggleReadStatus,
+    reorderBooks,
 
     // Computed values
     getBooksByStatus,

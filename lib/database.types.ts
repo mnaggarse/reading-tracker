@@ -28,6 +28,7 @@ export interface Database {
           cover: string | null;
           read: number; // Number of pages read (0 = unread, >0 = pages read)
           pages: number;
+          order: number; // Order for drag and drop functionality
           created_at: string;
           user_id: string;
         };
@@ -37,6 +38,7 @@ export interface Database {
           cover: string; // Required since database has NOT NULL constraint
           read: number; // Required since database has NOT NULL constraint
           pages: number; // Required since database has NOT NULL constraint
+          order?: number; // Optional, will be auto-generated
           created_at?: string;
           user_id: string;
         };
@@ -46,6 +48,7 @@ export interface Database {
           cover?: string | null;
           read?: number;
           pages?: number;
+          order?: number;
           created_at?: string;
           user_id?: string;
         };
@@ -92,4 +95,5 @@ export interface UserFormData {
 
 // Helper functions for read status conversion
 export const isBookRead = (read: number): boolean => read > 0;
-export const isBookCompleted = (read: number, pages: number): boolean => read >= pages && pages > 0;
+export const isBookCompleted = (read: number, pages: number): boolean =>
+  read >= pages && pages > 0;
