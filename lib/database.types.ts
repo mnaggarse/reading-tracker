@@ -26,7 +26,7 @@ export interface Database {
           id: string;
           title: string;
           cover: string | null;
-          read: number; // int2 - using 0 for false, 1 for true
+          read: number; // Number of pages read (0 = unread, >0 = pages read)
           pages: number;
           created_at: string;
           user_id: string;
@@ -82,7 +82,7 @@ export interface BookFormData {
   title: string;
   cover: string; // Required since we always provide a default value
   pages: number; // Required since we always provide a default value
-  read: boolean; // Required since we always provide a default value
+  read: number; // Number of pages read (0 = unread, >0 = pages read)
 }
 
 export interface UserFormData {
@@ -90,6 +90,6 @@ export interface UserFormData {
   email: string;
 }
 
-// Helper functions for boolean conversion
-export const bookReadToBoolean = (read: number): boolean => read === 1;
-export const booleanToBookRead = (read: boolean): number => (read ? 1 : 0);
+// Helper functions for read status conversion
+export const isBookRead = (read: number): boolean => read > 0;
+export const isBookCompleted = (read: number, pages: number): boolean => read >= pages && pages > 0;

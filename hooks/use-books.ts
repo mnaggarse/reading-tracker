@@ -27,7 +27,7 @@ export function useBooks() {
     title: string;
     cover: string; // Required since we always provide a default value
     pages: number; // Required since we always provide a default value
-    read: boolean; // Required since we always provide a default value
+    read: number; // Number of pages read (0 = unread, >0 = pages read)
   }) => {
     try {
       setError(null);

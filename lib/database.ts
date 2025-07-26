@@ -5,8 +5,6 @@ import {
   User,
   UserInsert,
   UserUpdate,
-  bookReadToBoolean,
-  booleanToBookRead,
 } from "./database.types";
 import { supabase } from "./supabase";
 
@@ -148,7 +146,7 @@ export const bookService = {
     title: string;
     cover: string; // Required since we always provide a default value
     pages: number; // Required since we always provide a default value
-    read: boolean; // Required since we always provide a default value
+    read: number; // Number of pages read (0 = unread, >0 = pages read)
   }): Promise<Book | null> {
     const {
       data: { user },
@@ -162,7 +160,7 @@ export const bookService = {
       title: bookData.title,
       cover: bookData.cover || "/placeholder.svg", // Provide default cover image
       pages: bookData.pages || 1, // Default to 1 page
-      read: bookData.read !== undefined ? booleanToBookRead(bookData.read) : 0, // Default to unread (0)
+      read: bookData.read || 0, // Default to 0 pages read (unread)
       user_id: user.id,
     };
 
@@ -229,7 +227,7 @@ export const bookService = {
 
   // Mark book as read/unread
   async toggleReadStatus(bookId: string, read: boolean): Promise<Book | null> {
-    return this.updateBook(bookId, { read: booleanToBookRead(read) });
+    return this.updateBook(bookId, { read: read ? 1 : 0 });
   },
 
   // Get books by read status
@@ -243,7 +241,7 @@ export const bookService = {
       .from("books")
       .select("*")
       .eq("user_id", user.id)
-      .eq("read", booleanToBookRead(read))
+      .eq("read", read ? 1 : 0)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -263,7 +261,7 @@ export const bookHelpers = {
       title: book.title,
       cover: book.cover || "",
       pages: book.pages,
-      read: bookReadToBoolean(book.read),
+      read: book.read,
     };
   },
 
@@ -272,13 +270,13 @@ export const bookHelpers = {
     title: string;
     cover: string; // Required since we always provide a default value
     pages?: number;
-    read?: boolean;
+    read?: number;
   }) {
     return {
       title: formData.title,
       cover: formData.cover || "/placeholder.svg", // Provide default cover image
       pages: formData.pages || 1, // Default to 1 page
-      read: formData.read !== undefined ? booleanToBookRead(formData.read) : 0, // Default to unread (0)
+      read: formData.read || 0, // Default to 0 pages read (unread)
     };
   },
 };

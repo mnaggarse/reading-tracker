@@ -17,7 +17,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBooks } from "@/hooks/use-books";
-import { testDatabaseConnection } from "@/lib/database";
 import { BookOpen, Loader2, Plus, Search } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -45,7 +44,6 @@ function AddBookContent() {
   const [hasSearched, setHasSearched] = useState(false);
   const [manualBook, setManualBook] = useState({
     title: "",
-    author: "",
     pages: "",
     cover: "",
   });
@@ -70,7 +68,7 @@ function AddBookContent() {
         console.error("Google Books API error:", data.error);
         setSearchResults([]);
       } else {
-      setSearchResults(data.items || []);
+        setSearchResults(data.items || []);
       }
     } catch (error) {
       console.error("Error searching books:", error);
@@ -84,41 +82,23 @@ function AddBookContent() {
     setAddingBookId(book.id);
     setIsAdding(true);
 
-    // Test database connection first
-    const dbConnected = await testDatabaseConnection();
-    if (!dbConnected) {
-      console.error("Database connection failed");
-      setIsAdding(false);
-      setAddingBookId(null);
-      return;
-    }
-
-    // Add a timeout to prevent infinite loading
-    const timeoutId = setTimeout(() => {
-      setIsAdding(false);
-      setAddingBookId(null);
-      console.error("Add book operation timed out");
-    }, 10000); // 10 second timeout
-
     try {
       const newBook = await addBook({
         title: book.volumeInfo.title,
         cover: book.volumeInfo.imageLinks?.thumbnail || "/placeholder.svg",
         pages: book.volumeInfo.pageCount || 1,
-        read: false,
+        read: 0,
       });
-
-      clearTimeout(timeoutId);
 
       if (newBook) {
         router.push("/dashboard");
       } else {
-        // If no book was returned, there was an error
         console.error("Failed to add book");
+        alert("Failed to add book. Please try again.");
       }
     } catch (error) {
-      clearTimeout(timeoutId);
       console.error("Error adding book:", error);
+      alert("Error adding book. Please try again.");
     } finally {
       setIsAdding(false);
       setAddingBookId(null);
@@ -127,38 +107,38 @@ function AddBookContent() {
 
   const addManualBook = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!manualBook.title) {
+    if (!manualBook.title.trim()) {
       alert("Please fill in at least the title");
       return;
     }
 
     setIsAdding(true);
 
-    // Add a timeout to prevent infinite loading
-    const timeoutId = setTimeout(() => {
-      setIsAdding(false);
-      console.error("Add book operation timed out");
-    }, 10000); // 10 second timeout
-
     try {
-      const newBook = await addBook({
-        title: manualBook.title,
-        cover: manualBook.cover || "/placeholder.svg",
+      console.log("Adding manual book:", {
+        title: manualBook.title.trim(),
+        cover: manualBook.cover.trim() || "/placeholder.svg",
         pages: manualBook.pages ? parseInt(manualBook.pages) : 1,
-        read: false,
+        read: 0,
       });
 
-      clearTimeout(timeoutId);
+      const newBook = await addBook({
+        title: manualBook.title.trim(),
+        cover: manualBook.cover.trim() || "/placeholder.svg",
+        pages: manualBook.pages ? parseInt(manualBook.pages) : 1,
+        read: 0,
+      });
 
       if (newBook) {
+        console.log("Book added successfully:", newBook);
         router.push("/dashboard");
       } else {
-        // If no book was returned, there was an error
-        console.error("Failed to add book");
+        console.error("Failed to add book - no book returned");
+        alert("Failed to add book. Please try again.");
       }
     } catch (error) {
-      clearTimeout(timeoutId);
       console.error("Error adding book:", error);
+      alert("Error adding book. Please try again.");
     } finally {
       setIsAdding(false);
     }
@@ -219,31 +199,31 @@ function AddBookContent() {
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex gap-3">
-                    <Input
-                      placeholder="Enter book title, author, or ISBN..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && searchBooks()}
+                      <Input
+                        placeholder="Enter book title, author, or ISBN..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyPress={(e) => e.key === "Enter" && searchBooks()}
                         className="flex-1 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                         disabled={isSearching}
-                    />
-                    <Button
-                      onClick={searchBooks}
+                      />
+                      <Button
+                        onClick={searchBooks}
                         disabled={isSearching || !searchQuery.trim()}
                         className="bg-blue-600 hover:bg-blue-700 rounded-xl px-6 font-medium"
-                    >
-                      {isSearching ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Searching...
-                        </>
-                      ) : (
+                      >
+                        {isSearching ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Searching...
+                          </>
+                        ) : (
                           <>
                             <Search className="h-4 w-4 mr-2" />
                             Search
                           </>
-                      )}
-                    </Button>
+                        )}
+                      </Button>
                     </div>
 
                     <div className="text-sm text-gray-500">
@@ -319,91 +299,91 @@ function AddBookContent() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {searchResults.map((book) => (
-                    <Card
-                      key={book.id}
+                    {searchResults.map((book) => (
+                      <Card
+                        key={book.id}
                         className="hover:shadow-lg transition-all duration-200 border border-gray-200 rounded-xl overflow-hidden group flex flex-col h-full"
-                    >
+                      >
                         <CardContent className="p-6 flex flex-col h-full">
                           <div className="flex flex-col h-full">
                             <div className="flex-shrink-0 mb-4">
                               <div className="relative mx-auto">
-                            <Image
-                              src={
-                                book.volumeInfo.imageLinks?.thumbnail ||
+                                <Image
+                                  src={
+                                    book.volumeInfo.imageLinks?.thumbnail ||
                                     "/placeholder.svg"
-                              }
-                              alt={book.volumeInfo.title}
+                                  }
+                                  alt={book.volumeInfo.title}
                                   width={120}
                                   height={180}
                                   className="mx-auto rounded-lg object-cover shadow-md group-hover:shadow-lg transition-shadow duration-200"
-                            />
+                                />
                                 {!book.volumeInfo.imageLinks?.thumbnail && (
                                   <div className="absolute inset-0 bg-gray-100 rounded-lg flex items-center justify-center">
                                     <BookOpen className="h-8 w-8 text-gray-400" />
                                   </div>
                                 )}
                               </div>
-                          </div>
+                            </div>
 
                             <div className="flex-1 min-w-0 text-center flex flex-col">
                               <div className="mb-4">
                                 <h3 className="font-bold text-lg mb-2 text-gray-900 line-clamp-2">
-                              {book.volumeInfo.title}
-                            </h3>
+                                  {book.volumeInfo.title}
+                                </h3>
 
-                            {book.volumeInfo.authors && (
+                                {book.volumeInfo.authors && (
                                   <p className="text-gray-600 mb-2 font-medium text-sm">
-                                by {book.volumeInfo.authors.join(", ")}
-                              </p>
-                            )}
+                                    by {book.volumeInfo.authors.join(", ")}
+                                  </p>
+                                )}
 
                                 <div className="flex items-center justify-center gap-4 text-sm text-gray-500 mb-3">
-                            {book.volumeInfo.pageCount && (
+                                  {book.volumeInfo.pageCount && (
                                     <span className="flex items-center gap-1">
                                       <BookOpen className="h-4 w-4" />
-                                {book.volumeInfo.pageCount} pages
+                                      {book.volumeInfo.pageCount} pages
                                     </span>
-                            )}
+                                  )}
                                 </div>
                               </div>
 
-                            {book.volumeInfo.description && (
+                              {book.volumeInfo.description && (
                                 <div className="mb-4 flex-1">
                                   <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
                                     {book.volumeInfo.description.replace(
                                       /<[^>]*>/g,
                                       ""
                                     )}
-                              </p>
+                                  </p>
                                 </div>
-                            )}
+                              )}
 
                               <div className="mt-auto pt-4">
-                            <Button
-                              onClick={() => addBookFromSearch(book)}
-                              size="sm"
+                                <Button
+                                  onClick={() => addBookFromSearch(book)}
+                                  size="sm"
                                   className="bg-blue-600 hover:bg-blue-700 rounded-xl px-6 py-2 h-auto font-medium w-full"
                                   disabled={addingBookId === book.id}
-                            >
+                                >
                                   {addingBookId === book.id ? (
-                                <>
+                                    <>
                                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                                       Adding to Library...
-                                </>
-                              ) : (
-                                <>
+                                    </>
+                                  ) : (
+                                    <>
                                       <Plus className="h-4 w-4 mr-2" />
-                                  Add to Library
-                                </>
-                              )}
-                            </Button>
+                                      Add to Library
+                                    </>
+                                  )}
+                                </Button>
                               </div>
+                            </div>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
                 </div>
               )}
@@ -422,38 +402,21 @@ function AddBookContent() {
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={addManualBook} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="title">Book Title *</Label>
-                        <Input
-                          id="title"
-                          placeholder="Enter book title"
-                          value={manualBook.title}
-                          onChange={(e) =>
-                            setManualBook({
-                              ...manualBook,
-                              title: e.target.value,
-                            })
-                          }
-                          required
-                          disabled={isAdding}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="author">Author</Label>
-                        <Input
-                          id="author"
-                          placeholder="Enter author name"
-                          value={manualBook.author}
-                          onChange={(e) =>
-                            setManualBook({
-                              ...manualBook,
-                              author: e.target.value,
-                            })
-                          }
-                          disabled={isAdding}
-                        />
-                      </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="title">Book Title *</Label>
+                      <Input
+                        id="title"
+                        placeholder="Enter book title"
+                        value={manualBook.title}
+                        onChange={(e) =>
+                          setManualBook({
+                            ...manualBook,
+                            title: e.target.value,
+                          })
+                        }
+                        required
+                        disabled={isAdding}
+                      />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
