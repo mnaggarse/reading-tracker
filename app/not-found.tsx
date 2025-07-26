@@ -12,9 +12,6 @@ export default function NotFoundPage() {
         <h1 className="text-4xl font-bold text-center text-gray-900 mb-2">
           404 - Page Not Found
         </h1>
-        <p className="text-lg text-gray-600 mb-8 text-center max-w-md">
-          Sorry, the page you are looking for does not exist or has been moved.
-        </p>
         <Button
           asChild
           className="bg-blue-600 hover:bg-blue-700 px-8 py-3 text-lg rounded-xl"
