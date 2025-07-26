@@ -15,8 +15,7 @@ import { useEffect, useState } from "react";
 
 function ProfileContent() {
   const { user } = useAuth();
-  const { books, getCompletedBooks, getInProgressBooks, getUnreadBooks } =
-    useBooks();
+  const { books } = useBooks();
 
   const [userStats, setUserStats] = useState({
     name: "User",
@@ -40,8 +39,12 @@ function ProfileContent() {
       });
 
       // Calculate real statistics from books
-      const completedBooks = getCompletedBooks();
-      const inProgressBooks = getInProgressBooks();
+      const completedBooks = books.filter(
+        (book) => book.pages > 0 && book.read >= book.pages
+      );
+      const inProgressBooks = books.filter(
+        (book) => book.read > 0 && book.read < book.pages
+      );
 
       const totalPagesRead = books.reduce((total, book) => {
         return total + Math.min(book.read, book.pages);
@@ -61,7 +64,7 @@ function ProfileContent() {
         joinDate: joinDate,
       });
     }
-  }, [user, books, getCompletedBooks, getInProgressBooks]);
+  }, [user, books]);
 
   const statCards = [
     {
@@ -143,7 +146,9 @@ function ProfileContent() {
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>Books Completed</span>
-                  <span>{userStats.totalBooksRead} books</span>
+                  <span>
+                    {userStats.totalBooksRead}/{books.length} books
+                  </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
@@ -161,7 +166,13 @@ function ProfileContent() {
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>Pages Read</span>
-                  <span>{userStats.totalPagesRead.toLocaleString()} pages</span>
+                  <span>
+                    {userStats.totalPagesRead.toLocaleString()}/
+                    {books
+                      .reduce((total, book) => total + book.pages, 0)
+                      .toLocaleString()}{" "}
+                    pages
+                  </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
@@ -181,112 +192,6 @@ function ProfileContent() {
                   ></div>
                 </div>
               </div>
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Reading Progress</span>
-                  <span>{userStats.currentlyReading} in progress</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-orange-600 h-2 rounded-full"
-                    style={{
-                      width: `${
-                        books.length > 0
-                          ? (userStats.currentlyReading / books.length) * 100
-                          : 0
-                      }%`,
-                    }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Your latest reading updates</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {books.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <BookOpen className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                  <p>No books in your library yet</p>
-                  <p className="text-sm">
-                    Add some books to see your reading activity here
-                  </p>
-                </div>
-              ) : (
-                <>
-                  {getCompletedBooks()
-                    .slice(0, 2)
-                    .map((book) => (
-                      <div
-                        key={book.id}
-                        className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
-                      >
-                        <BookOpen className="h-5 w-5 text-green-600" />
-                        <div>
-                          <p className="font-medium">
-                            Completed "{book.title}"
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {new Date(book.created_at).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                              }
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-
-                  {getInProgressBooks()
-                    .slice(0, 2)
-                    .map((book) => (
-                      <div
-                        key={book.id}
-                        className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
-                      >
-                        <TrendingUp className="h-5 w-5 text-blue-600" />
-                        <div>
-                          <p className="font-medium">Reading "{book.title}"</p>
-                          <p className="text-sm text-gray-600">
-                            Page {book.read} of {book.pages}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-
-                  {getUnreadBooks()
-                    .slice(0, 1)
-                    .map((book) => (
-                      <div
-                        key={book.id}
-                        className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
-                      >
-                        <Target className="h-5 w-5 text-orange-600" />
-                        <div>
-                          <p className="font-medium">Added "{book.title}"</p>
-                          <p className="text-sm text-gray-600">
-                            {new Date(book.created_at).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                              }
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                </>
-              )}
             </div>
           </CardContent>
         </Card>
