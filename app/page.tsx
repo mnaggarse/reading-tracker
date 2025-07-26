@@ -17,6 +17,7 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -92,8 +93,14 @@ export default function HomePage() {
                   {isSigningIn ? (
                     <Loader2 className="h-5 w-5 animate-spin mr-2" />
                   ) : null}
+                  <Image
+                    src="/google.svg"
+                    alt="Google"
+                    width={20}
+                    height={20}
+                    className="mr-2"
+                  />
                   Continue with Google
-                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               )}
             </div>
@@ -133,50 +140,6 @@ export default function HomePage() {
                 </CardContent>
               </Card>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4 bg-blue-600">
-        <div className="container mx-auto text-center">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Ready to Transform Your Reading?
-            </h2>
-            <p className="text-xl text-blue-100 mb-8">
-              Join thousands of readers who are already tracking their progress
-              and achieving their reading goals.
-            </p>
-            {user ? (
-              <Link href="/dashboard">
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  className="text-lg px-8 py-3"
-                >
-                  Go to Dashboard
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-            ) : (
-              <Button
-                size="lg"
-                className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-3"
-                onClick={async () => {
-                  setIsSigningIn(true);
-                  await signInWithGoogle();
-                  setIsSigningIn(false);
-                }}
-                disabled={isSigningIn}
-              >
-                {isSigningIn ? (
-                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                ) : null}
-                Continue with Google
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            )}
           </div>
         </div>
       </section>
