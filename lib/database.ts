@@ -14,7 +14,6 @@ export const testDatabaseConnection = async () => {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    console.log("Current user:", user);
 
     if (user) {
       const { data, error } = await supabase
@@ -27,7 +26,6 @@ export const testDatabaseConnection = async () => {
         return false;
       }
 
-      console.log("Database connection test successful");
       return true;
     } else {
       console.error("No authenticated user for database test");
@@ -164,8 +162,6 @@ export const bookService = {
       user_id: user.id,
     };
 
-    console.log("Attempting to insert book:", newBook);
-
     const { data, error } = await supabase
       .from("books")
       .insert(newBook)
@@ -177,7 +173,6 @@ export const bookService = {
       return null;
     }
 
-    console.log("Successfully added book:", data);
     return data;
   },
 

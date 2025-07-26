@@ -115,13 +115,6 @@ function AddBookContent() {
     setIsAdding(true);
 
     try {
-      console.log("Adding manual book:", {
-        title: manualBook.title.trim(),
-        cover: manualBook.cover.trim() || "/placeholder.svg",
-        pages: manualBook.pages ? parseInt(manualBook.pages) : 1,
-        read: 0,
-      });
-
       const newBook = await addBook({
         title: manualBook.title.trim(),
         cover: manualBook.cover.trim() || "/placeholder.svg",
@@ -130,7 +123,6 @@ function AddBookContent() {
       });
 
       if (newBook) {
-        console.log("Book added successfully:", newBook);
         router.push("/dashboard");
       } else {
         console.error("Failed to add book - no book returned");
