@@ -9,20 +9,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useBooks } from "@/hooks/use-books";
 import { useAuth } from "@/lib/auth-context";
 import { BookOpen, Calendar, Target, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
 
 function ProfileContent() {
   const { user } = useAuth();
+  const { books, getCompletedBooks, getInProgressBooks, getUnreadBooks } =
+    useBooks();
+
   const [userStats, setUserStats] = useState({
     name: "User",
     email: "",
-    totalBooksRead: 12,
-    totalPagesRead: 3420,
-    currentlyReading: 3,
-    averagePagesPerDay: 15,
-    readingStreak: 7,
+    totalBooksRead: 0,
+    totalPagesRead: 0,
+    currentlyReading: 0,
+    averagePagesPerDay: 0,
+    readingStreak: 0,
     joinDate: "January 2024",
   });
 
@@ -36,14 +40,29 @@ function ProfileContent() {
         month: "long",
       });
 
-      setUserStats((prev) => ({
-        ...prev,
+      // Calculate real statistics from books
+      const completedBooks = getCompletedBooks();
+      const inProgressBooks = getInProgressBooks();
+
+      const totalPagesRead = books.reduce((total, book) => {
+        return total + Math.min(book.read, book.pages);
+      }, 0);
+
+      const averagePagesPerDay =
+        books.length > 0 ? Math.round(totalPagesRead / books.length) : 0;
+
+      setUserStats({
         name: userName,
         email: userEmail,
+        totalBooksRead: completedBooks.length,
+        totalPagesRead: totalPagesRead,
+        currentlyReading: inProgressBooks.length,
+        averagePagesPerDay: averagePagesPerDay,
+        readingStreak: 0, // This would need additional tracking
         joinDate: joinDate,
-      }));
+      });
     }
-  }, [user]);
+  }, [user, books, getCompletedBooks, getInProgressBooks]);
 
   const statCards = [
     {
@@ -68,10 +87,10 @@ function ProfileContent() {
       color: "text-orange-600",
     },
     {
-      title: "Reading Streak",
-      value: `${userStats.readingStreak} days`,
+      title: "Total Books",
+      value: books.length,
       icon: Calendar,
-      description: "Consecutive reading days",
+      description: "Books in library",
       color: "text-purple-600",
     },
   ];
@@ -120,35 +139,66 @@ function ProfileContent() {
           <CardHeader>
             <CardTitle>Reading Goals</CardTitle>
             <CardDescription>
-              Your progress towards this year's reading goals
+              Your progress towards reading goals
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span>Annual Reading Goal</span>
-                  <span>{userStats.totalBooksRead}/24 books</span>
+                  <span>Books Completed</span>
+                  <span>{userStats.totalBooksRead} books</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-blue-600 h-2 rounded-full"
                     style={{
-                      width: `${(userStats.totalBooksRead / 24) * 100}%`,
+                      width: `${
+                        books.length > 0
+                          ? (userStats.totalBooksRead / books.length) * 100
+                          : 0
+                      }%`,
                     }}
                   ></div>
                 </div>
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span>Daily Reading Goal</span>
-                  <span>{userStats.averagePagesPerDay}/20 pages</span>
+                  <span>Pages Read</span>
+                  <span>{userStats.totalPagesRead.toLocaleString()} pages</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-green-600 h-2 rounded-full"
                     style={{
-                      width: `${(userStats.averagePagesPerDay / 20) * 100}%`,
+                      width: `${
+                        books.length > 0
+                          ? (userStats.totalPagesRead /
+                              books.reduce(
+                                (total, book) => total + book.pages,
+                                0
+                              )) *
+                            100
+                          : 0
+                      }%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span>Reading Progress</span>
+                  <span>{userStats.currentlyReading} in progress</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-orange-600 h-2 rounded-full"
+                    style={{
+                      width: `${
+                        books.length > 0
+                          ? (userStats.currentlyReading / books.length) * 100
+                          : 0
+                      }%`,
                     }}
                   ></div>
                 </div>
@@ -165,31 +215,82 @@ function ProfileContent() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <BookOpen className="h-5 w-5 text-blue-600" />
-                <div>
-                  <p className="font-medium">Finished reading "1984"</p>
-                  <p className="text-sm text-gray-600">2 days ago</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <TrendingUp className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="font-medium">
-                    Updated progress on "The Great Gatsby"
+              {books.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <BookOpen className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                  <p>No books in your library yet</p>
+                  <p className="text-sm">
+                    Add some books to see your reading activity here
                   </p>
-                  <p className="text-sm text-gray-600">3 days ago</p>
                 </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <Target className="h-5 w-5 text-orange-600" />
-                <div>
-                  <p className="font-medium">
-                    Started reading "Pride and Prejudice"
-                  </p>
-                  <p className="text-sm text-gray-600">1 week ago</p>
-                </div>
-              </div>
+              ) : (
+                <>
+                  {getCompletedBooks()
+                    .slice(0, 2)
+                    .map((book) => (
+                      <div
+                        key={book.id}
+                        className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                      >
+                        <BookOpen className="h-5 w-5 text-green-600" />
+                        <div>
+                          <p className="font-medium">
+                            Completed "{book.title}"
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {new Date(book.created_at).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                              }
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+
+                  {getInProgressBooks()
+                    .slice(0, 2)
+                    .map((book) => (
+                      <div
+                        key={book.id}
+                        className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                      >
+                        <TrendingUp className="h-5 w-5 text-blue-600" />
+                        <div>
+                          <p className="font-medium">Reading "{book.title}"</p>
+                          <p className="text-sm text-gray-600">
+                            Page {book.read} of {book.pages}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+
+                  {getUnreadBooks()
+                    .slice(0, 1)
+                    .map((book) => (
+                      <div
+                        key={book.id}
+                        className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                      >
+                        <Target className="h-5 w-5 text-orange-600" />
+                        <div>
+                          <p className="font-medium">Added "{book.title}"</p>
+                          <p className="text-sm text-gray-600">
+                            {new Date(book.created_at).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                              }
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
