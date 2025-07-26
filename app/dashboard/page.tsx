@@ -17,7 +17,7 @@ import { UpdateProgressModal } from "@/components/update-progress-modal";
 import { useBooks } from "@/hooks/use-books";
 import { useAuth } from "@/lib/auth-context";
 import { Book } from "@/lib/database.types";
-import { BookOpen, Home, Loader2, LogOut, Plus, User } from "lucide-react";
+import { BookOpen, Loader2, LogOut, Plus, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -162,30 +162,17 @@ function DashboardContent() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-4">
-              <Link
-                href="/"
-                className="text-sm font-medium transition-colors hover:text-blue-600 text-gray-600"
-              >
-                <Home className="h-4 w-4 inline mr-1" />
-                Home
-              </Link>
-              <Link
-                href="/dashboard"
-                className="text-sm font-medium transition-colors hover:text-blue-600 text-blue-600"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/add-book"
-                className="text-sm font-medium transition-colors hover:text-blue-600 text-gray-600"
-              >
-                Add Book
-              </Link>
+              <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700">
+                <Link href="/add-book">
+                  <Plus className="h-4 w-4" />
+                  Add Book
+                </Link>
+              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-2">
                     <User className="h-4 w-4" />
-                    {user?.email}
+                    Profile
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -215,40 +202,30 @@ function DashboardContent() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              My Reading List
-            </h1>
-            <p className="text-gray-600 mt-1">
-              Track your reading progress • {totalBooks} books •{" "}
-              {completedBooks} completed • {inProgressBooks} in progress •{" "}
-              {unreadBooks} to read
-            </p>
-          </div>
-          <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700">
-            <Link href="/add-book">
-              <Plus className="h-4 w-4" />
-              Add Book
-            </Link>
-          </Button>
-        </div>
-
         {totalBooks === 0 ? (
-          <div className="text-center py-16">
-            <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              No books yet
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Start building your reading list by adding your first book!
-            </p>
-            <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700">
-              <Link href="/add-book">
-                <Plus className="h-4 w-4" />
-                Add Your First Book
-              </Link>
-            </Button>
+          <div className="text-center py-20">
+            <div className="max-w-md mx-auto">
+              <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <BookOpen className="h-12 w-12 text-blue-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                Start Your Reading Journey
+              </h2>
+              <p className="text-gray-600 mb-8 text-lg">
+                Add your first book to begin tracking your reading progress and
+                building your personal library.
+              </p>
+              <Button
+                asChild
+                size="lg"
+                className="gap-3 bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <Link href="/add-book">
+                  <Plus className="h-5 w-5" />
+                  Add Your First Book
+                </Link>
+              </Button>
+            </div>
           </div>
         ) : (
           <>
@@ -272,6 +249,20 @@ function DashboardContent() {
           </>
         )}
       </div>
+
+      {/* Floating Action Button - Mobile Only */}
+      {totalBooks > 0 && (
+        <div className="fixed bottom-6 right-6 z-50 md:hidden">
+          <Button
+            asChild
+            className="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all duration-200"
+          >
+            <Link href="/add-book">
+              <Plus />
+            </Link>
+          </Button>
+        </div>
+      )}
 
       {/* Progress Modal */}
       <UpdateProgressModal
