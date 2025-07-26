@@ -169,7 +169,7 @@ function AddBookContent() {
             </div>
 
             {/* Mobile Navigation */}
-            <MobileNav currentPath="/add-book" />
+            <MobileNav />
           </div>
         </div>
       </nav>

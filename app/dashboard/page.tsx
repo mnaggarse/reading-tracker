@@ -162,12 +162,6 @@ function DashboardContent() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-4">
-              <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700">
-                <Link href="/add-book">
-                  <Plus className="h-4 w-4" />
-                  Add Book
-                </Link>
-              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-2">
@@ -192,10 +186,16 @@ function DashboardContent() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700">
+                <Link href="/add-book">
+                  <Plus className="h-4 w-4" />
+                  Add Book
+                </Link>
+              </Button>
             </div>
 
             {/* Mobile Navigation */}
-            <MobileNav currentPath="/dashboard" />
+            <MobileNav />
           </div>
         </div>
       </nav>
@@ -249,20 +249,6 @@ function DashboardContent() {
           </>
         )}
       </div>
-
-      {/* Floating Action Button - Mobile Only */}
-      {totalBooks > 0 && (
-        <div className="fixed bottom-6 right-6 z-50 md:hidden">
-          <Button
-            asChild
-            className="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all duration-200"
-          >
-            <Link href="/add-book">
-              <Plus />
-            </Link>
-          </Button>
-        </div>
-      )}
 
       {/* Progress Modal */}
       <UpdateProgressModal
