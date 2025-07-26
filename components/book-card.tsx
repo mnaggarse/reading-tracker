@@ -28,7 +28,7 @@ export function BookCard({ book, onClick, onEdit, onDelete }: BookCardProps) {
     <ContextMenu>
       <ContextMenuTrigger>
         <Card
-          className="hover:shadow-lg transition-shadow duration-200 group rounded-xl cursor-pointer h-80"
+          className="select-none hover:shadow-lg transition-shadow duration-200 group rounded-xl cursor-pointer h-80"
           onClick={onClick}
         >
           <CardContent className="p-4 h-full flex flex-col">
