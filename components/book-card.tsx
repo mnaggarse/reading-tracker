@@ -55,7 +55,16 @@ export function BookCard({ book, onClick, onEdit, onDelete }: BookCardProps) {
               </h3>
 
               <div className="mt-auto">
-                {/* Progress Bar and Percentage */}
+                {/* Pages and Percentage Row */}
+                {book.pages > 0 && (
+                  <div className="flex justify-between items-center mb-2 text-xs text-gray-600">
+                    <span>
+                      {book.read} / {book.pages} pages
+                    </span>
+                    <span>{Math.floor(progress)}%</span>
+                  </div>
+                )}
+                {/* Progress Bar */}
                 {book.pages > 0 && (
                   <div className="flex items-center gap-2">
                     <div className="flex-1 bg-gray-200 rounded-full h-2">
@@ -66,9 +75,6 @@ export function BookCard({ book, onClick, onEdit, onDelete }: BookCardProps) {
                         style={{ width: `${Math.min(progress, 100)}%` }}
                       ></div>
                     </div>
-                    <span className="text-xs text-gray-600 font-medium text-right">
-                      {Math.floor(progress)}%
-                    </span>
                   </div>
                 )}
               </div>
