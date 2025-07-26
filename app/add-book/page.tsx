@@ -6,13 +6,7 @@ import type React from "react";
 import { MobileNav } from "@/components/mobile-nav";
 import { ProtectedRoute } from "@/components/protected-route";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -180,13 +174,10 @@ function AddBookContent() {
             <TabsContent value="search" className="space-y-6">
               <Card className="rounded-xl">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="w-full flex justify-center items-center gap-2">
                     <Search className="h-5 w-5" />
-                    Search Google Books
+                    Search for Books
                   </CardTitle>
-                  <CardDescription>
-                    Search for books from Google's extensive library
-                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -216,13 +207,6 @@ function AddBookContent() {
                           </>
                         )}
                       </Button>
-                    </div>
-
-                    <div className="text-sm text-gray-500">
-                      <p>
-                        💡 <strong>Search tips:</strong> Try searching by title,
-                        author name, or ISBN for better results
-                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -263,18 +247,6 @@ function AddBookContent() {
                     Try searching with different keywords or add the book
                     manually
                   </p>
-                  <Button
-                    onClick={() => {
-                      const manualTab = document.querySelector(
-                        '[data-value="manual"]'
-                      ) as HTMLElement;
-                      if (manualTab) manualTab.click();
-                    }}
-                    variant="outline"
-                    className="rounded-xl"
-                  >
-                    Add Manually Instead
-                  </Button>
                 </div>
               )}
 
@@ -384,13 +356,10 @@ function AddBookContent() {
             <TabsContent value="manual">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex justify-center items-center gap-2">
                     <BookOpen className="h-5 w-5" />
                     Add Book Manually
                   </CardTitle>
-                  <CardDescription>
-                    Enter book details manually if you can't find it in search
-                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={addManualBook} className="space-y-4">
@@ -411,8 +380,23 @@ function AddBookContent() {
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2 col-span-2">
+                        <Label htmlFor="cover">Cover Image URL</Label>
+                        <Input
+                          id="cover"
+                          placeholder="Enter cover image URL (optional)"
+                          value={manualBook.cover}
+                          onChange={(e) =>
+                            setManualBook({
+                              ...manualBook,
+                              cover: e.target.value,
+                            })
+                          }
+                          disabled={isAdding}
+                        />
+                      </div>
+                      <div className="space-y-2 col-span-1">
                         <Label htmlFor="pages">Total Pages</Label>
                         <Input
                           id="pages"
@@ -424,21 +408,6 @@ function AddBookContent() {
                             setManualBook({
                               ...manualBook,
                               pages: e.target.value,
-                            })
-                          }
-                          disabled={isAdding}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="cover">Cover Image URL</Label>
-                        <Input
-                          id="cover"
-                          placeholder="Enter cover image URL (optional)"
-                          value={manualBook.cover}
-                          onChange={(e) =>
-                            setManualBook({
-                              ...manualBook,
-                              cover: e.target.value,
                             })
                           }
                           disabled={isAdding}

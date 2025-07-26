@@ -13,7 +13,6 @@ import {
   ArrowRight,
   BookOpen,
   Loader2,
-  Star,
   Target,
   TrendingUp,
   Users,
@@ -50,30 +49,6 @@ export default function HomePage() {
       title: "Personal Library",
       description:
         "Build your personal digital library with books from Google Books or add them manually.",
-    },
-  ];
-
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "Book Club Leader",
-      content:
-        "ReadTracker has completely transformed how I manage my reading. The progress tracking keeps me motivated!",
-      rating: 5,
-    },
-    {
-      name: "Michael Chen",
-      role: "Student",
-      content:
-        "Perfect for tracking my academic reading. The goal-setting feature helps me stay on top of my studies.",
-      rating: 5,
-    },
-    {
-      name: "Emma Davis",
-      role: "Book Blogger",
-      content:
-        "I love how easy it is to add books and track my progress. The interface is clean and intuitive.",
-      rating: 5,
     },
   ];
 
@@ -162,50 +137,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20 px-4 bg-gray-50">
-        <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Loved by Readers Worldwide
-            </h2>
-            <p className="text-xl text-gray-600">
-              Join thousands of readers who have transformed their reading
-              habits with ReadTracker.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card
-                key={index}
-                className="hover:shadow-lg transition-shadow duration-300"
-              >
-                <CardContent className="p-6">
-                  <div className="flex mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className="h-5 w-5 text-yellow-400 fill-current"
-                      />
-                    ))}
-                  </div>
-                  <p className="text-gray-700 mb-4 italic">
-                    "{testimonial.content}"
-                  </p>
-                  <div>
-                    <p className="font-semibold text-gray-900">
-                      {testimonial.name}
-                    </p>
-                    <p className="text-sm text-gray-600">{testimonial.role}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="py-20 px-4 bg-blue-600">
         <div className="container mx-auto text-center">
@@ -249,21 +180,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-12 px-4 bg-gray-900 text-white">
-        <div className="container mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <BookOpen className="h-6 w-6 text-blue-400" />
-              <span className="font-semibold text-xl">ReadTracker</span>
-            </div>
-            <div className="text-gray-400 text-sm">
-              © 2024 ReadTracker. All rights reserved.
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
