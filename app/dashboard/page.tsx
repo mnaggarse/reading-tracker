@@ -74,14 +74,32 @@ function DashboardContent() {
     const currentBook = books.find((book) => book.id === bookId);
     if (currentBook && updates.pages < currentBook.read) {
       // Reset read pages to 0 when total pages is reduced
-      await updateBook(bookId, { ...updates, read: 0 });
+      const result = await updateBook(bookId, { ...updates, read: 0 });
+      if (result) {
+        setIsEditModalOpen(false);
+        setBookForAction(null);
+        // Reload books to ensure proper ordering
+        await loadBooks();
+      }
     } else {
-      await updateBook(bookId, updates);
+      const result = await updateBook(bookId, updates);
+      if (result) {
+        setIsEditModalOpen(false);
+        setBookForAction(null);
+        // Reload books to ensure proper ordering
+        await loadBooks();
+      }
     }
   };
 
   const handleDeleteConfirm = async (bookId: string) => {
-    await deleteBook(bookId);
+    const result = await deleteBook(bookId);
+    if (result) {
+      setIsDeleteDialogOpen(false);
+      setBookForAction(null);
+      // Reload books to ensure proper ordering
+      await loadBooks();
+    }
   };
 
   const handleSignOut = async () => {
