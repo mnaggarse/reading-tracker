@@ -33,12 +33,6 @@ export function MobileNav({ currentPath }: MobileNavProps) {
       icon: BookOpen,
       isActive: currentPath === "/dashboard",
     },
-    {
-      href: "/add-book",
-      label: "Add Book",
-      icon: Plus,
-      isActive: currentPath === "/add-book",
-    },
   ];
 
   return (
