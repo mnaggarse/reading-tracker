@@ -168,7 +168,7 @@ function DashboardContent() {
                   Profile
                 </Link>
               </Button>
-              <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700">
+              <Button asChild className="font-bold gap-2 bg-blue-600 hover:bg-blue-700">
                 <Link href="/add-book">
                   <Plus className="h-4 w-4" />
                   Add Book

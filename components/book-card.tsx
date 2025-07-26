@@ -83,12 +83,18 @@ export function BookCard({ book, onClick, onEdit, onDelete }: BookCardProps) {
         </Card>
       </ContextMenuTrigger>
       <ContextMenuContent className="rounded-lg">
-        <ContextMenuItem onClick={onEdit} className="font-semibold">
+        <ContextMenuItem
+          onClick={onEdit}
+          className="font-semibold cursor-pointer"
+        >
           <Edit className="mr-2 h-4 w-4" />
           Edit Book
         </ContextMenuItem>
         <ContextMenuSeparator />
-        <ContextMenuItem onClick={onDelete} className="text-red-600 font-semibold">
+        <ContextMenuItem
+          onClick={onDelete}
+          className="text-red-600 font-semibold cursor-pointer"
+        >
           <Trash2 className="mr-2 h-4 w-4" />
           Delete Book
         </ContextMenuItem>
