@@ -2,6 +2,7 @@
 
 import { Session, User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
+import { userService } from "./database";
 import { supabase } from "./supabase";
 
 interface AuthContextType {
@@ -30,10 +31,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+
+      // Create user profile when user signs in
+      if (session?.user && _event === "SIGNED_IN") {
+        try {
+          await userService.upsertUser({
+            id: session.user.id,
+            email: session.user.email!,
+            name:
+              session.user.user_metadata?.full_name ||
+              session.user.user_metadata?.name ||
+              null,
+          });
+        } catch (error) {
+          console.error("Error creating user profile:", error);
+        }
+      }
     });
 
     return () => subscription.unsubscribe();

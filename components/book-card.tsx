@@ -1,29 +1,23 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import { Card, CardContent } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-
-interface Book {
-  id: number
-  title: string
-  cover: string
-  totalPages: number
-  currentPage: number
-}
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Book, bookReadToBoolean } from "@/lib/database.types";
+import { BookOpen, CheckCircle, Star } from "lucide-react";
+import Image from "next/image";
 
 interface BookCardProps {
-  book: Book
-  onClick: () => void
+  book: Book;
+  onClick: () => void;
+  onToggleRead: () => void;
 }
 
-export function BookCard({ book, onClick }: BookCardProps) {
-  const progress = (book.currentPage / book.totalPages) * 100
-  const isCompleted = book.currentPage >= book.totalPages
-  const isNotStarted = book.currentPage === 0
+export function BookCard({ book, onClick, onToggleRead }: BookCardProps) {
+  const isRead = bookReadToBoolean(book.read);
 
   return (
-    <Card className="cursor-pointer hover:shadow-lg transition-shadow duration-200 group rounded-xl" onClick={onClick}>
+    <Card className="hover:shadow-lg transition-shadow duration-200 group rounded-xl">
       <CardContent className="p-4">
         <div className="relative mb-4">
           <Image
@@ -33,22 +27,66 @@ export function BookCard({ book, onClick }: BookCardProps) {
             height={300}
             className="w-full h-48 object-cover rounded-md group-hover:scale-105 transition-transform duration-200"
           />
+          {isRead && (
+            <div className="absolute top-2 right-2">
+              <CheckCircle className="h-6 w-6 text-green-600 bg-white rounded-full" />
+            </div>
+          )}
         </div>
 
         <div className="space-y-3">
-          <h3 className="font-semibold text-sm leading-tight line-clamp-2 min-h-[2.5rem] text-center">{book.title}</h3>
+          <h3 className="font-semibold text-sm leading-tight line-clamp-2 min-h-[2.5rem] text-center">
+            {book.title}
+          </h3>
 
           <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs text-gray-600">
+              <span>{book.pages} pages</span>
+              {book.rating && (
+                <div className="flex items-center gap-1">
+                  <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                  <span>{book.rating}/5</span>
+                </div>
+              )}
+            </div>
+
             <div className="flex items-center justify-between">
-              <Progress
-                value={progress}
-                className={`h-2 flex-1 ${progress === 100 ? "[&>div]:bg-green-600" : "[&>div]:bg-blue-600"}`}
-              />
-              <span className="text-xs text-gray-600 ml-2">{Math.round(progress)}%</span>
+              <Badge
+                variant={isRead ? "default" : "secondary"}
+                className={`text-xs ${
+                  isRead
+                    ? "bg-green-100 text-green-800"
+                    : "bg-gray-100 text-gray-800"
+                }`}
+              >
+                {isRead ? (
+                  <>
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Read
+                  </>
+                ) : (
+                  <>
+                    <BookOpen className="h-3 w-3 mr-1" />
+                    To Read
+                  </>
+                )}
+              </Badge>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleRead();
+                }}
+                className="text-xs h-7 px-2"
+              >
+                {isRead ? "Mark Unread" : "Mark Read"}
+              </Button>
             </div>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

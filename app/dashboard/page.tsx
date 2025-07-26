@@ -1,6 +1,7 @@
 "use client";
 
 import { BookCard } from "@/components/book-card";
+import { MobileNav } from "@/components/mobile-nav";
 import { ProtectedRoute } from "@/components/protected-route";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,95 +11,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UpdateProgressModal } from "@/components/update-progress-modal";
+import { useBooks } from "@/hooks/use-books";
 import { useAuth } from "@/lib/auth-context";
-import { BookOpen, Home, LogOut, Plus, User } from "lucide-react";
+import { Book } from "@/lib/database.types";
+import { BookOpen, Home, Loader2, LogOut, Plus, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
-// Mock data for books
-const mockBooks = [
-  {
-    id: 1,
-    title: "The Great Gatsby",
-    cover: "/placeholder.svg?height=300&width=200&text=The+Great+Gatsby",
-    totalPages: 180,
-    currentPage: 120,
-  },
-  {
-    id: 2,
-    title: "To Kill a Mockingbird",
-    cover: "/placeholder.svg?height=300&width=200&text=To+Kill+a+Mockingbird",
-    totalPages: 376,
-    currentPage: 200,
-  },
-  {
-    id: 3,
-    title: "1984",
-    cover: "/placeholder.svg?height=300&width=200&text=1984",
-    totalPages: 328,
-    currentPage: 328,
-  },
-  {
-    id: 4,
-    title: "Pride and Prejudice",
-    cover: "/placeholder.svg?height=300&width=200&text=Pride+and+Prejudice",
-    totalPages: 432,
-    currentPage: 50,
-  },
-  {
-    id: 5,
-    title: "The Catcher in the Rye",
-    cover: "/placeholder.svg?height=300&width=200&text=The+Catcher+in+the+Rye",
-    totalPages: 277,
-    currentPage: 0,
-  },
-  {
-    id: 6,
-    title: "Lord of the Flies",
-    cover: "/placeholder.svg?height=300&width=200&text=Lord+of+the+Flies",
-    totalPages: 224,
-    currentPage: 150,
-  },
-  {
-    id: 7,
-    title: "Brave New World",
-    cover: "/placeholder.svg?height=300&width=200&text=Brave+New+World",
-    totalPages: 268,
-    currentPage: 0,
-  },
-  {
-    id: 8,
-    title: "The Hobbit",
-    cover: "/placeholder.svg?height=300&width=200&text=The+Hobbit",
-    totalPages: 310,
-    currentPage: 310,
-  },
-];
-
 function DashboardContent() {
   const { user, signOut } = useAuth();
-  const [books, setBooks] = useState(mockBooks);
-  const [selectedBook, setSelectedBook] = useState<
-    (typeof mockBooks)[0] | null
-  >(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const {
+    books,
+    loading,
+    error,
+    getReadBooks,
+    getUnreadBooks,
+    toggleReadStatus,
+    updateRating,
+    totalBooks,
+    readBooks,
+    unreadBooks,
+  } = useBooks();
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
-  const handleBookClick = (book: (typeof mockBooks)[0]) => {
+  const handleBookClick = (book: Book) => {
     setSelectedBook(book);
-    setIsModalOpen(true);
   };
 
-  const handleUpdateProgress = (bookId: number, newPage: number) => {
-    setBooks(
-      books.map((book) =>
-        book.id === bookId
-          ? { ...book, currentPage: Math.min(newPage, book.totalPages) }
-          : book
-      )
-    );
-    setIsModalOpen(false);
-    setSelectedBook(null);
+  const handleToggleRead = async (book: Book) => {
+    await toggleReadStatus(book.id);
   };
 
   const handleSignOut = async () => {
@@ -106,11 +47,8 @@ function DashboardContent() {
   };
 
   // Organize books by reading status
-  const currentlyReading = books.filter(
-    (book) => book.currentPage > 0 && book.currentPage < book.totalPages
-  );
-  const notStarted = books.filter((book) => book.currentPage === 0);
-  const completed = books.filter((book) => book.currentPage >= book.totalPages);
+  const readBooksList = getReadBooks();
+  const unreadBooksList = getUnreadBooks();
 
   const BookSection = ({
     title,
@@ -118,7 +56,7 @@ function DashboardContent() {
     emptyMessage,
   }: {
     title: string;
-    books: typeof mockBooks;
+    books: Book[];
     emptyMessage: string;
   }) => (
     <div className="mb-12">
@@ -132,6 +70,7 @@ function DashboardContent() {
               key={book.id}
               book={book}
               onClick={() => handleBookClick(book)}
+              onToggleRead={() => handleToggleRead(book)}
             />
           ))}
         </div>
@@ -142,6 +81,33 @@ function DashboardContent() {
       )}
     </div>
   );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600">Loading your books...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Error: {error}</p>
+          <Button
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -157,7 +123,8 @@ function DashboardContent() {
               ReadTracker
             </Link>
 
-            <div className="flex items-center gap-4">
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-4">
               <Link
                 href="/"
                 className="text-sm font-medium transition-colors hover:text-blue-600 text-gray-600"
@@ -202,6 +169,9 @@ function DashboardContent() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
+
+            {/* Mobile Navigation */}
+            <MobileNav currentPath="/dashboard" />
           </div>
         </div>
       </nav>
@@ -213,9 +183,12 @@ function DashboardContent() {
             <h1 className="text-3xl font-bold text-gray-900">
               My Reading List
             </h1>
-            <p className="text-gray-600 mt-1">Track your reading progress</p>
+            <p className="text-gray-600 mt-1">
+              Track your reading progress • {totalBooks} books • {readBooks}{" "}
+              read • {unreadBooks} to read
+            </p>
           </div>
-          <Button asChild className="gap-2">
+          <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700">
             <Link href="/add-book">
               <Plus className="h-4 w-4" />
               Add Book
@@ -223,33 +196,37 @@ function DashboardContent() {
           </Button>
         </div>
 
-        <BookSection
-          title="Currently Reading"
-          books={currentlyReading}
-          emptyMessage="No books currently being read. Start reading a book from your list!"
-        />
+        {totalBooks === 0 ? (
+          <div className="text-center py-16">
+            <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              No books yet
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Start building your reading list by adding your first book!
+            </p>
+            <Button asChild className="gap-2 bg-blue-600 hover:bg-blue-700">
+              <Link href="/add-book">
+                <Plus className="h-4 w-4" />
+                Add Your First Book
+              </Link>
+            </Button>
+          </div>
+        ) : (
+          <>
+            <BookSection
+              title="Read Books"
+              books={readBooksList}
+              emptyMessage="No books completed yet. Keep reading to see your achievements here!"
+            />
 
-        <BookSection
-          title="Not Started"
-          books={notStarted}
-          emptyMessage="No books waiting to be read. Add some books to your reading list!"
-        />
-
-        <BookSection
-          title="Completed"
-          books={completed}
-          emptyMessage="No books completed yet. Keep reading to see your achievements here!"
-        />
-
-        <UpdateProgressModal
-          book={selectedBook}
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false);
-            setSelectedBook(null);
-          }}
-          onUpdate={handleUpdateProgress}
-        />
+            <BookSection
+              title="To Read"
+              books={unreadBooksList}
+              emptyMessage="No books waiting to be read. Add some books to your reading list!"
+            />
+          </>
+        )}
       </div>
     </div>
   );
