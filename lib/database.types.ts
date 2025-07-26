@@ -35,10 +35,10 @@ export interface Database {
         Insert: {
           id?: string;
           title: string;
-          cover?: string | null;
-          read?: number;
-          pages: number;
-          rating?: number | null;
+          cover: string; // Required since database has NOT NULL constraint
+          read: number; // Required since database has NOT NULL constraint
+          pages: number; // Required since database has NOT NULL constraint
+          rating: number; // Required since database has NOT NULL constraint
           created_at?: string;
           user_id: string;
         };
@@ -83,10 +83,10 @@ export interface BookWithUser extends Book {
 // Form types for easier handling
 export interface BookFormData {
   title: string;
-  cover?: string;
-  pages: number;
-  read: boolean;
-  rating?: number;
+  cover: string; // Required since we always provide a default value
+  pages: number; // Required since we always provide a default value
+  read: boolean; // Required since we always provide a default value
+  rating: number; // Required since we always provide a default value
 }
 
 export interface UserFormData {

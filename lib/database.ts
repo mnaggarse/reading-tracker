@@ -10,6 +10,37 @@ import {
 } from "./database.types";
 import { supabase } from "./supabase";
 
+// Test database connectivity
+export const testDatabaseConnection = async () => {
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    console.log("Current user:", user);
+
+    if (user) {
+      const { data, error } = await supabase
+        .from("books")
+        .select("count")
+        .limit(1);
+
+      if (error) {
+        console.error("Database connection test failed:", error);
+        return false;
+      }
+
+      console.log("Database connection test successful");
+      return true;
+    } else {
+      console.error("No authenticated user for database test");
+      return false;
+    }
+  } catch (error) {
+    console.error("Database test error:", error);
+    return false;
+  }
+};
+
 // User operations
 export const userService = {
   // Get current user profile
@@ -113,16 +144,31 @@ export const bookService = {
   },
 
   // Add a new book for current user
-  async addBook(bookData: Omit<BookInsert, "user_id">): Promise<Book | null> {
+  async addBook(bookData: {
+    title: string;
+    cover: string; // Required since we always provide a default value
+    pages: number; // Required since we always provide a default value
+    read: boolean; // Required since we always provide a default value
+    rating: number; // Required since we always provide a default value
+  }): Promise<Book | null> {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return null;
+    if (!user) {
+      console.error("No authenticated user found");
+      return null;
+    }
 
     const newBook: BookInsert = {
-      ...bookData,
+      title: bookData.title,
+      cover: bookData.cover || "/placeholder.svg", // Provide default cover image
+      pages: bookData.pages || 0, // Default to 0 pages
+      read: bookData.read !== undefined ? booleanToBookRead(bookData.read) : 0, // Default to unread (0)
+      rating: bookData.rating || 0, // Default to 0 rating
       user_id: user.id,
     };
+
+    console.log("Attempting to insert book:", newBook);
 
     const { data, error } = await supabase
       .from("books")
@@ -135,6 +181,7 @@ export const bookService = {
       return null;
     }
 
+    console.log("Successfully added book:", data);
     return data;
   },
 
@@ -253,17 +300,17 @@ export const bookHelpers = {
   // Convert form data to database insert
   toInsertData(formData: {
     title: string;
-    cover?: string;
-    pages: number;
-    read: boolean;
-    rating?: number;
+    cover: string; // Required since we always provide a default value
+    pages: number; // Required since we always provide a default value
+    read: boolean; // Required since we always provide a default value
+    rating: number; // Required since we always provide a default value
   }) {
     return {
       title: formData.title,
-      cover: formData.cover || null,
-      pages: formData.pages,
-      read: booleanToBookRead(formData.read),
-      rating: formData.rating || null,
+      cover: formData.cover || "/placeholder.svg", // Provide default cover image
+      pages: formData.pages || 0, // Default to 0 pages
+      read: formData.read !== undefined ? booleanToBookRead(formData.read) : 0, // Default to unread (0)
+      rating: formData.rating || 0, // Default to 0 rating
     };
   },
 };

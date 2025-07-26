@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBooks } from "@/hooks/use-books";
+import { testDatabaseConnection } from "@/lib/database";
 import { BookOpen, Loader2, Plus, Search } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -71,18 +72,40 @@ function AddBookContent() {
 
   const addBookFromSearch = async (book: GoogleBook) => {
     setIsAdding(true);
+
+    // Test database connection first
+    const dbConnected = await testDatabaseConnection();
+    if (!dbConnected) {
+      console.error("Database connection failed");
+      setIsAdding(false);
+      return;
+    }
+
+    // Add a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      setIsAdding(false);
+      console.error("Add book operation timed out");
+    }, 10000); // 10 second timeout
+
     try {
       const newBook = await addBook({
         title: book.volumeInfo.title,
-        cover: book.volumeInfo.imageLinks?.thumbnail || undefined,
+        cover: book.volumeInfo.imageLinks?.thumbnail || "/placeholder.svg",
         pages: book.volumeInfo.pageCount || 0,
         read: false,
+        rating: 0,
       });
+
+      clearTimeout(timeoutId);
 
       if (newBook) {
         router.push("/dashboard");
+      } else {
+        // If no book was returned, there was an error
+        console.error("Failed to add book");
       }
     } catch (error) {
+      clearTimeout(timeoutId);
       console.error("Error adding book:", error);
     } finally {
       setIsAdding(false);
@@ -91,24 +114,38 @@ function AddBookContent() {
 
   const addManualBook = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!manualBook.title || !manualBook.pages) {
-      alert("Please fill in at least the title and total pages");
+    if (!manualBook.title) {
+      alert("Please fill in at least the title");
       return;
     }
 
     setIsAdding(true);
+
+    // Add a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      setIsAdding(false);
+      console.error("Add book operation timed out");
+    }, 10000); // 10 second timeout
+
     try {
       const newBook = await addBook({
         title: manualBook.title,
-        cover: manualBook.cover || undefined,
-        pages: parseInt(manualBook.pages),
+        cover: manualBook.cover || "/placeholder.svg",
+        pages: manualBook.pages ? parseInt(manualBook.pages) : 0,
         read: false,
+        rating: 0,
       });
+
+      clearTimeout(timeoutId);
 
       if (newBook) {
         router.push("/dashboard");
+      } else {
+        // If no book was returned, there was an error
+        console.error("Failed to add book");
       }
     } catch (error) {
+      clearTimeout(timeoutId);
       console.error("Error adding book:", error);
     } finally {
       setIsAdding(false);
@@ -306,12 +343,12 @@ function AddBookContent() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="pages">Total Pages *</Label>
+                        <Label htmlFor="pages">Total Pages</Label>
                         <Input
                           id="pages"
                           type="number"
                           min="1"
-                          placeholder="Enter total pages"
+                          placeholder="Enter total pages (optional)"
                           value={manualBook.pages}
                           onChange={(e) =>
                             setManualBook({
@@ -319,7 +356,6 @@ function AddBookContent() {
                               pages: e.target.value,
                             })
                           }
-                          required
                           disabled={isAdding}
                         />
                       </div>

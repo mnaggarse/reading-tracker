@@ -1,4 +1,4 @@
-import { bookHelpers, bookService } from "@/lib/database";
+import { bookService } from "@/lib/database";
 import { Book, bookReadToBoolean } from "@/lib/database.types";
 import { useEffect, useState } from "react";
 
@@ -25,15 +25,14 @@ export function useBooks() {
   // Add a new book
   const addBook = async (bookData: {
     title: string;
-    cover?: string;
-    pages: number;
-    read: boolean;
-    rating?: number;
+    cover: string; // Required since we always provide a default value
+    pages: number; // Required since we always provide a default value
+    read: boolean; // Required since we always provide a default value
+    rating: number; // Required since we always provide a default value
   }) => {
     try {
       setError(null);
-      const insertData = bookHelpers.toInsertData(bookData);
-      const newBook = await bookService.addBook(insertData);
+      const newBook = await bookService.addBook(bookData);
 
       if (newBook) {
         setBooks((prev) => [newBook, ...prev]);
@@ -52,10 +51,10 @@ export function useBooks() {
     bookId: string,
     updates: Partial<{
       title: string;
-      cover?: string;
-      pages: number;
-      read: boolean;
-      rating?: number;
+      cover: string; // Required since we always provide a default value
+      pages: number; // Required since we always provide a default value
+      read: boolean; // Required since we always provide a default value
+      rating: number; // Required since we always provide a default value
     }>
   ) => {
     try {
@@ -63,11 +62,11 @@ export function useBooks() {
       const bookUpdate: any = {};
 
       if (updates.title !== undefined) bookUpdate.title = updates.title;
-      if (updates.cover !== undefined) bookUpdate.cover = updates.cover || null;
-      if (updates.pages !== undefined) bookUpdate.pages = updates.pages;
+      if (updates.cover !== undefined)
+        bookUpdate.cover = updates.cover || "/placeholder.svg";
+      if (updates.pages !== undefined) bookUpdate.pages = updates.pages || 0;
       if (updates.read !== undefined) bookUpdate.read = updates.read ? 1 : 0;
-      if (updates.rating !== undefined)
-        bookUpdate.rating = updates.rating || null;
+      if (updates.rating !== undefined) bookUpdate.rating = updates.rating || 0;
 
       const updatedBook = await bookService.updateBook(bookId, bookUpdate);
 
