@@ -32,7 +32,6 @@ function DashboardContent() {
     getCompletedBooks,
     getInProgressBooks,
     toggleReadStatus,
-    updateRating,
     updateBook,
     totalBooks,
     readBooks,
@@ -68,7 +67,7 @@ function DashboardContent() {
 
   const handleEditSave = async (
     bookId: string,
-    updates: { title: string; cover: string; pages: number; rating: number }
+    updates: { title: string; cover: string; pages: number }
   ) => {
     // Find the current book to check if we need to reset read pages
     const currentBook = books.find((book) => book.id === bookId);

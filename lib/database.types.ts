@@ -28,7 +28,6 @@ export interface Database {
           cover: string | null;
           read: number; // int2 - using 0 for false, 1 for true
           pages: number;
-          rating: number | null;
           created_at: string;
           user_id: string;
         };
@@ -38,7 +37,6 @@ export interface Database {
           cover: string; // Required since database has NOT NULL constraint
           read: number; // Required since database has NOT NULL constraint
           pages: number; // Required since database has NOT NULL constraint
-          rating: number; // Required since database has NOT NULL constraint
           created_at?: string;
           user_id: string;
         };
@@ -48,7 +46,6 @@ export interface Database {
           cover?: string | null;
           read?: number;
           pages?: number;
-          rating?: number | null;
           created_at?: string;
           user_id?: string;
         };
@@ -86,7 +83,6 @@ export interface BookFormData {
   cover: string; // Required since we always provide a default value
   pages: number; // Required since we always provide a default value
   read: boolean; // Required since we always provide a default value
-  rating: number; // Required since we always provide a default value
 }
 
 export interface UserFormData {

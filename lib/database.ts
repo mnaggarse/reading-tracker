@@ -149,7 +149,6 @@ export const bookService = {
     cover: string; // Required since we always provide a default value
     pages: number; // Required since we always provide a default value
     read: boolean; // Required since we always provide a default value
-    rating: number; // Required since we always provide a default value
   }): Promise<Book | null> {
     const {
       data: { user },
@@ -164,7 +163,6 @@ export const bookService = {
       cover: bookData.cover || "/placeholder.svg", // Provide default cover image
       pages: bookData.pages || 1, // Default to 1 page
       read: bookData.read !== undefined ? booleanToBookRead(bookData.read) : 0, // Default to unread (0)
-      rating: bookData.rating || 0, // Default to 0 rating
       user_id: user.id,
     };
 
@@ -234,11 +232,6 @@ export const bookService = {
     return this.updateBook(bookId, { read: booleanToBookRead(read) });
   },
 
-  // Update book rating
-  async updateRating(bookId: string, rating: number): Promise<Book | null> {
-    return this.updateBook(bookId, { rating });
-  },
-
   // Get books by read status
   async getBooksByStatus(read: boolean): Promise<Book[]> {
     const {
@@ -260,28 +253,6 @@ export const bookService = {
 
     return data || [];
   },
-
-  // Get books by rating
-  async getBooksByRating(minRating: number): Promise<Book[]> {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return [];
-
-    const { data, error } = await supabase
-      .from("books")
-      .select("*")
-      .eq("user_id", user.id)
-      .gte("rating", minRating)
-      .order("rating", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching books by rating:", error);
-      return [];
-    }
-
-    return data || [];
-  },
 };
 
 // Helper functions for form data conversion
@@ -293,7 +264,6 @@ export const bookHelpers = {
       cover: book.cover || "",
       pages: book.pages,
       read: bookReadToBoolean(book.read),
-      rating: book.rating || undefined,
     };
   },
 
@@ -303,14 +273,12 @@ export const bookHelpers = {
     cover: string; // Required since we always provide a default value
     pages?: number;
     read?: boolean;
-    rating?: number;
   }) {
     return {
       title: formData.title,
       cover: formData.cover || "/placeholder.svg", // Provide default cover image
       pages: formData.pages || 1, // Default to 1 page
       read: formData.read !== undefined ? booleanToBookRead(formData.read) : 0, // Default to unread (0)
-      rating: formData.rating || 0, // Default to 0 rating
     };
   },
 };

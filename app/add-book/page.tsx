@@ -54,14 +54,21 @@ function AddBookContent() {
     if (!searchQuery.trim()) return;
 
     setIsSearching(true);
+    setSearchResults([]);
     try {
       const response = await fetch(
         `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
           searchQuery
-        )}&maxResults=20`
+        )}&maxResults=20&orderBy=relevance`
       );
       const data = await response.json();
-      setSearchResults(data.items || []);
+
+      if (data.error) {
+        console.error("Google Books API error:", data.error);
+        setSearchResults([]);
+      } else {
+        setSearchResults(data.items || []);
+      }
     } catch (error) {
       console.error("Error searching books:", error);
       setSearchResults([]);
@@ -93,7 +100,6 @@ function AddBookContent() {
         cover: book.volumeInfo.imageLinks?.thumbnail || "/placeholder.svg",
         pages: book.volumeInfo.pageCount || 1,
         read: false,
-        rating: 0,
       });
 
       clearTimeout(timeoutId);
@@ -133,7 +139,6 @@ function AddBookContent() {
         cover: manualBook.cover || "/placeholder.svg",
         pages: manualBook.pages ? parseInt(manualBook.pages) : 1,
         read: false,
-        rating: 0,
       });
 
       clearTimeout(timeoutId);
@@ -176,7 +181,7 @@ function AddBookContent() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
+          <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-gray-900">Add New Book</h1>
             <p className="text-gray-600 mt-1">
               Search for books or add them manually
@@ -184,13 +189,17 @@ function AddBookContent() {
           </div>
 
           <Tabs defaultValue="search" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="search">Search Books</TabsTrigger>
-              <TabsTrigger value="manual">Add Manually</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 rounded-xl">
+              <TabsTrigger value="search" className="rounded-lg">
+                Search Books
+              </TabsTrigger>
+              <TabsTrigger value="manual" className="rounded-lg">
+                Add Manually
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="search" className="space-y-6">
-              <Card>
+              <Card className="rounded-xl">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Search className="h-5 w-5" />
@@ -201,95 +210,177 @@ function AddBookContent() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Enter book title, author, or ISBN..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && searchBooks()}
-                      className="flex-1"
-                    />
-                    <Button
-                      onClick={searchBooks}
-                      disabled={isSearching}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      {isSearching ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Searching...
-                        </>
-                      ) : (
-                        "Search"
-                      )}
-                    </Button>
+                  <div className="space-y-4">
+                    <div className="flex gap-3">
+                      <Input
+                        placeholder="Enter book title, author, or ISBN..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyPress={(e) => e.key === "Enter" && searchBooks()}
+                        className="flex-1 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                        disabled={isSearching}
+                      />
+                      <Button
+                        onClick={searchBooks}
+                        disabled={isSearching || !searchQuery.trim()}
+                        className="bg-blue-600 hover:bg-blue-700 rounded-xl px-6 font-medium"
+                      >
+                        {isSearching ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Searching...
+                          </>
+                        ) : (
+                          <>
+                            <Search className="h-4 w-4 mr-2" />
+                            Search
+                          </>
+                        )}
+                      </Button>
+                    </div>
+
+                    <div className="text-sm text-gray-500">
+                      <p>
+                        💡 <strong>Search tips:</strong> Try searching by title,
+                        author name, or ISBN for better results
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {searchResults.length > 0 && (
-                <div className="grid gap-4">
-                  {searchResults.map((book) => (
-                    <Card
-                      key={book.id}
-                      className="hover:shadow-md transition-shadow"
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex gap-4">
-                          <div className="flex-shrink-0">
-                            <Image
-                              src={
-                                book.volumeInfo.imageLinks?.thumbnail ||
-                                "/placeholder.svg?height=120&width=80&text=No+Cover"
-                              }
-                              alt={book.volumeInfo.title}
-                              width={80}
-                              height={120}
-                              className="rounded-md object-cover"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-lg mb-1 truncate">
-                              {book.volumeInfo.title}
-                            </h3>
-                            {book.volumeInfo.authors && (
-                              <p className="text-gray-600 mb-2">
-                                by {book.volumeInfo.authors.join(", ")}
-                              </p>
-                            )}
-                            {book.volumeInfo.pageCount && (
-                              <p className="text-sm text-gray-500 mb-2">
-                                {book.volumeInfo.pageCount} pages
-                              </p>
-                            )}
-                            {book.volumeInfo.description && (
-                              <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-                                {book.volumeInfo.description}
-                              </p>
-                            )}
-                            <Button
-                              onClick={() => addBookFromSearch(book)}
-                              size="sm"
-                              className="bg-blue-600 hover:bg-blue-700"
-                              disabled={isAdding}
-                            >
-                              {isAdding ? (
-                                <>
-                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                                  Adding...
-                                </>
-                              ) : (
-                                <>
-                                  <Plus className="h-4 w-4 mr-1" />
-                                  Add to Library
-                                </>
+              {/* Search Results */}
+              {isSearching && (
+                <div className="text-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+                  <p className="text-gray-600">Searching for books...</p>
+                </div>
+              )}
+
+              {!isSearching && searchQuery && searchResults.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <BookOpen className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    No books found
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Try searching with different keywords or add the book
+                    manually
+                  </p>
+                  <Button
+                    onClick={() => {
+                      const manualTab = document.querySelector(
+                        '[data-value="manual"]'
+                      ) as HTMLElement;
+                      if (manualTab) manualTab.click();
+                    }}
+                    variant="outline"
+                    className="rounded-xl"
+                  >
+                    Add Manually Instead
+                  </Button>
+                </div>
+              )}
+
+              {!isSearching && searchResults.length > 0 && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Found {searchResults.length} book
+                      {searchResults.length !== 1 ? "s" : ""}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      Click "Add to Library" to save a book
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {searchResults.map((book) => (
+                      <Card
+                        key={book.id}
+                        className="hover:shadow-lg transition-all duration-200 border border-gray-200 rounded-xl overflow-hidden group"
+                      >
+                        <CardContent className="p-6">
+                          <div className="flex flex-col">
+                            <div className="flex-shrink-0 mb-4">
+                              <div className="relative mx-auto">
+                                <Image
+                                  src={
+                                    book.volumeInfo.imageLinks?.thumbnail ||
+                                    "/placeholder.svg"
+                                  }
+                                  alt={book.volumeInfo.title}
+                                  width={120}
+                                  height={180}
+                                  className="mx-auto rounded-lg object-cover shadow-md group-hover:shadow-lg transition-shadow duration-200"
+                                />
+                                {!book.volumeInfo.imageLinks?.thumbnail && (
+                                  <div className="absolute inset-0 bg-gray-100 rounded-lg flex items-center justify-center">
+                                    <BookOpen className="h-8 w-8 text-gray-400" />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex-1 min-w-0 text-center">
+                              <div className="mb-4">
+                                <h3 className="font-bold text-lg mb-2 text-gray-900 line-clamp-2">
+                                  {book.volumeInfo.title}
+                                </h3>
+
+                                {book.volumeInfo.authors && (
+                                  <p className="text-gray-600 mb-2 font-medium text-sm">
+                                    by {book.volumeInfo.authors.join(", ")}
+                                  </p>
+                                )}
+
+                                <div className="flex items-center justify-center gap-4 text-sm text-gray-500 mb-3">
+                                  {book.volumeInfo.pageCount && (
+                                    <span className="flex items-center gap-1">
+                                      <BookOpen className="h-4 w-4" />
+                                      {book.volumeInfo.pageCount} pages
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {book.volumeInfo.description && (
+                                <div className="mb-4">
+                                  <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
+                                    {book.volumeInfo.description.replace(
+                                      /<[^>]*>/g,
+                                      ""
+                                    )}
+                                  </p>
+                                </div>
                               )}
-                            </Button>
+
+                              <Button
+                                onClick={() => addBookFromSearch(book)}
+                                size="sm"
+                                className="bg-blue-600 hover:bg-blue-700 rounded-xl px-6 py-2 h-auto font-medium w-full"
+                                disabled={isAdding}
+                              >
+                                {isAdding ? (
+                                  <>
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                    Adding to Library...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Add to Library
+                                  </>
+                                )}
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 </div>
               )}
             </TabsContent>

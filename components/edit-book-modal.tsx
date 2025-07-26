@@ -28,7 +28,7 @@ interface EditBookModalProps {
   onClose: () => void;
   onSave: (
     bookId: string,
-    updates: { title: string; cover: string; pages: number; rating: number }
+    updates: { title: string; cover: string; pages: number }
   ) => void;
 }
 
@@ -42,7 +42,6 @@ export function EditBookModal({
     title: "",
     cover: "",
     pages: "",
-    rating: "",
   });
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(false);
@@ -53,7 +52,6 @@ export function EditBookModal({
         title: book.title,
         cover: book.cover || "",
         pages: book.pages.toString(),
-        rating: book.rating ? book.rating.toString() : "",
       });
     }
   }, [book]);
@@ -76,7 +74,6 @@ export function EditBookModal({
         title: formData.title,
         cover: formData.cover || "/placeholder.svg",
         pages: newPages,
-        rating: parseInt(formData.rating) || 0,
       });
       onClose();
     }
@@ -88,7 +85,6 @@ export function EditBookModal({
         title: formData.title,
         cover: formData.cover || "/placeholder.svg",
         pages: parseInt(formData.pages) || 1,
-        rating: parseInt(formData.rating) || 0,
       });
       setShowConfirmation(false);
       setPendingSubmit(false);
@@ -103,7 +99,7 @@ export function EditBookModal({
 
   const handleClose = () => {
     onClose();
-    setFormData({ title: "", cover: "", pages: "", rating: "" });
+    setFormData({ title: "", cover: "", pages: "" });
     setShowConfirmation(false);
     setPendingSubmit(false);
   };
@@ -149,37 +145,19 @@ export function EditBookModal({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="pages">Total Pages</Label>
-                  <Input
-                    id="pages"
-                    type="number"
-                    min="1"
-                    value={formData.pages}
-                    onChange={(e) =>
-                      setFormData({ ...formData, pages: e.target.value })
-                    }
-                    required
-                    className="rounded-xl"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="rating">Rating (1-5)</Label>
-                  <Input
-                    id="rating"
-                    type="number"
-                    min="0"
-                    max="5"
-                    value={formData.rating}
-                    onChange={(e) =>
-                      setFormData({ ...formData, rating: e.target.value })
-                    }
-                    placeholder="0-5"
-                    className="rounded-xl"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="pages">Total Pages</Label>
+                <Input
+                  id="pages"
+                  type="number"
+                  min="1"
+                  value={formData.pages}
+                  onChange={(e) =>
+                    setFormData({ ...formData, pages: e.target.value })
+                  }
+                  required
+                  className="rounded-xl"
+                />
               </div>
             </div>
 

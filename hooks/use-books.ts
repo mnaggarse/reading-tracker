@@ -28,7 +28,6 @@ export function useBooks() {
     cover: string; // Required since we always provide a default value
     pages: number; // Required since we always provide a default value
     read: boolean; // Required since we always provide a default value
-    rating: number; // Required since we always provide a default value
   }) => {
     try {
       setError(null);
@@ -54,7 +53,6 @@ export function useBooks() {
       cover: string; // Required since we always provide a default value
       pages: number; // Required since we always provide a default value
       read: number; // Page number (0 = unread, >0 = current page)
-      rating: number; // Required since we always provide a default value
     }>
   ) => {
     try {
@@ -66,7 +64,6 @@ export function useBooks() {
         bookUpdate.cover = updates.cover || "/placeholder.svg";
       if (updates.pages !== undefined) bookUpdate.pages = updates.pages || 1;
       if (updates.read !== undefined) bookUpdate.read = updates.read || 0;
-      if (updates.rating !== undefined) bookUpdate.rating = updates.rating || 0;
 
       const updatedBook = await bookService.updateBook(bookId, bookUpdate);
 
@@ -113,12 +110,6 @@ export function useBooks() {
     return result !== null;
   };
 
-  // Update rating
-  const updateRating = async (bookId: string, rating: number) => {
-    const result = await updateBook(bookId, { rating });
-    return result !== null;
-  };
-
   // Get books by status
   const getBooksByStatus = (read: boolean) => {
     return books.filter((book) => {
@@ -142,19 +133,11 @@ export function useBooks() {
     return books.filter((book) => book.read > 0 && book.read < book.pages);
   };
 
-  // Get books by rating
-  const getBooksByRating = (minRating: number) => {
-    return books.filter((book) => book.rating && book.rating >= minRating);
-  };
-
   // Get read books (legacy - now returns in-progress books)
   const getReadBooks = () => getInProgressBooks();
 
   // Get unread books
   const getUnreadBooks = () => getBooksByStatus(false);
-
-  // Get highly rated books (4+ stars)
-  const getHighlyRatedBooks = () => getBooksByRating(4);
 
   // Load books on mount
   useEffect(() => {
@@ -173,16 +156,13 @@ export function useBooks() {
     updateBook,
     deleteBook,
     toggleReadStatus,
-    updateRating,
 
     // Computed values
     getBooksByStatus,
-    getBooksByRating,
     getReadBooks,
     getUnreadBooks,
     getCompletedBooks,
     getInProgressBooks,
-    getHighlyRatedBooks,
 
     // Statistics
     totalBooks: books.length,
@@ -190,10 +170,5 @@ export function useBooks() {
     unreadBooks: getUnreadBooks().length,
     completedBooks: getCompletedBooks().length,
     inProgressBooks: getInProgressBooks().length,
-    averageRating:
-      books.length > 0
-        ? books.reduce((sum, book) => sum + (book.rating || 0), 0) /
-          books.filter((book) => book.rating).length
-        : 0,
   };
 }
