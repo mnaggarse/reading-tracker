@@ -123,6 +123,7 @@ export function EditBookModal({
                 <Label htmlFor="title">Book Title</Label>
                 <Input
                   id="title"
+                  autoFocus={false}
                   value={formData.title}
                   onChange={(e) =>
                     setFormData({ ...formData, title: e.target.value })
@@ -136,6 +137,7 @@ export function EditBookModal({
                 <Label htmlFor="cover">Cover Image URL</Label>
                 <Input
                   id="cover"
+                  autoFocus={false}
                   value={formData.cover}
                   onChange={(e) =>
                     setFormData({ ...formData, cover: e.target.value })
@@ -149,6 +151,7 @@ export function EditBookModal({
                 <Label htmlFor="pages">Total Pages</Label>
                 <Input
                   id="pages"
+                  autoFocus={false}
                   type="number"
                   min="1"
                   value={formData.pages}
