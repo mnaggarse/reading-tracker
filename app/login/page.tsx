@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth-context";
 import { BookOpen, Loader2 } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 
 export default function LoginPage() {
@@ -89,12 +88,7 @@ export default function LoginPage() {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
-          <p className="text-sm text-center text-gray-600">
-            {"Don't have an account? "}
-            <Link href="/signup" className="text-blue-600 hover:underline">
-              Sign up
-            </Link>
-          </p>
+          {/* No sign up link needed, Google handles both sign in and sign up */}
         </CardFooter>
       </Card>
     </div>

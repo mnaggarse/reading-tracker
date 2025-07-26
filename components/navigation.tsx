@@ -97,11 +97,8 @@ export function Navigation() {
               </>
             ) : (
               <div className="flex items-center gap-2">
-                <Button variant="ghost" asChild>
-                  <Link href="/login">Login</Link>
-                </Button>
                 <Button asChild className="bg-blue-600 hover:bg-blue-700">
-                  <Link href="/signup">Sign Up</Link>
+                  <Link href="/login">Continue with Google</Link>
                 </Button>
               </div>
             )}

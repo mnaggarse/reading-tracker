@@ -103,11 +103,8 @@ export default function HomePage() {
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Button variant="ghost" asChild>
-                    <Link href="/login">Login</Link>
-                  </Button>
                   <Button asChild className="bg-blue-600 hover:bg-blue-700">
-                    <Link href="/signup">Sign Up</Link>
+                    <Link href="/login">Continue with Google</Link>
                   </Button>
                 </div>
               )}
@@ -142,22 +139,13 @@ export default function HomePage() {
                 </Link>
               ) : (
                 <>
-                  <Link href="/signup">
+                  <Link href="/login">
                     <Button
                       size="lg"
                       className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3"
                     >
-                      Get Started Free
+                      Continue with Google
                       <ArrowRight className="ml-2 h-5 w-5" />
-                    </Button>
-                  </Link>
-                  <Link href="/login">
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="text-lg px-8 py-3"
-                    >
-                      Sign In
                     </Button>
                   </Link>
                 </>
