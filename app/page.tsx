@@ -12,6 +12,7 @@ import { useAuth } from "@/lib/auth-context";
 import {
   ArrowRight,
   BookOpen,
+  Loader2,
   Star,
   Target,
   TrendingUp,
@@ -21,8 +22,9 @@ import Link from "next/link";
 import { useState } from "react";
 
 export default function HomePage() {
-  const { user } = useAuth();
+  const { user, signInWithGoogle } = useAuth();
   const [isHovered, setIsHovered] = useState(false);
+  const [isSigningIn, setIsSigningIn] = useState(false);
 
   const features = [
     {
@@ -102,17 +104,22 @@ export default function HomePage() {
                   </Button>
                 </Link>
               ) : (
-                <>
-                  <Link href="/login">
-                    <Button
-                      size="lg"
-                      className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3"
-                    >
-                      Continue with Google
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Button>
-                  </Link>
-                </>
+                <Button
+                  size="lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3"
+                  onClick={async () => {
+                    setIsSigningIn(true);
+                    await signInWithGoogle();
+                    setIsSigningIn(false);
+                  }}
+                  disabled={isSigningIn}
+                >
+                  {isSigningIn ? (
+                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                  ) : null}
+                  Continue with Google
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
               )}
             </div>
           </div>
@@ -222,16 +229,22 @@ export default function HomePage() {
                 </Button>
               </Link>
             ) : (
-              <Link href="/signup">
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  className="text-lg px-8 py-3"
-                >
-                  Start Reading Today
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
+              <Button
+                size="lg"
+                className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-3"
+                onClick={async () => {
+                  setIsSigningIn(true);
+                  await signInWithGoogle();
+                  setIsSigningIn(false);
+                }}
+                disabled={isSigningIn}
+              >
+                {isSigningIn ? (
+                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                ) : null}
+                Continue with Google
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
             )}
           </div>
         </div>

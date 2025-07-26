@@ -31,7 +31,7 @@ export function Navigation() {
     localStorage.removeItem("userEmail");
     localStorage.removeItem("userName");
     setIsLoggedIn(false);
-    router.push("/login");
+    router.push("/");
   };
 
   // Don't show navigation on auth pages

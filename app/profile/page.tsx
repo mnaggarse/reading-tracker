@@ -22,12 +22,14 @@ import {
 import { useBooks } from "@/hooks/use-books";
 import { useAuth } from "@/lib/auth-context";
 import { BookOpen, Calendar, Target, TrendingUp } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 function ProfileContent() {
   const { user } = useAuth();
   const { books, deleteAllBooks } = useBooks();
   const { signOut } = useAuth();
+  const router = useRouter();
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
   const [userStats, setUserStats] = useState({
@@ -219,7 +221,10 @@ function ProfileContent() {
             <div className="flex gap-4">
               <Button
                 variant="outline"
-                onClick={signOut}
+                onClick={async () => {
+                  await signOut();
+                  router.push("/");
+                }}
                 className="rounded-xl"
               >
                 Logout

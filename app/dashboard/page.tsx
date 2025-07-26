@@ -78,6 +78,7 @@ function DashboardContent() {
 
   const handleSignOut = async () => {
     await signOut();
+    window.location.href = "/";
   };
 
   // Organize books by reading status
