@@ -364,7 +364,7 @@ function AddBookContent() {
                                   onClick={() => addBookFromSearch(book)}
                                   size="sm"
                                   className="bg-blue-600 hover:bg-blue-700 rounded-xl px-6 py-2 h-auto font-medium w-full"
-                                  disabled={addingBookId === book.id}
+                                  disabled={isAdding}
                                 >
                                   {addingBookId === book.id ? (
                                     <>
