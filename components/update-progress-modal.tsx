@@ -95,6 +95,7 @@ export function UpdateProgressModal({
                   id="currentPage"
                   type="number"
                   min="0"
+                  autoFocus
                   max={book.pages}
                   value={currentPage}
                   onChange={(e) => setCurrentPage(e.target.value)}
