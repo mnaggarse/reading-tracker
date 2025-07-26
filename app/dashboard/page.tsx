@@ -35,6 +35,7 @@ function DashboardContent() {
     deleteBook,
     reorderBooks,
     loadBooks,
+    setBooks,
   } = useBooks();
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isProgressModalOpen, setIsProgressModalOpen] = useState(false);
@@ -58,7 +59,11 @@ function DashboardContent() {
   };
 
   const handleProgressUpdate = async (bookId: string, newPage: number) => {
-    await updateBook(bookId, { read: newPage });
+    const result = await updateBook(bookId, { read: newPage });
+    if (result) {
+      // Reload books to ensure they appear in the correct section
+      await loadBooks();
+    }
   };
 
   const handleEditSave = async (

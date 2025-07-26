@@ -211,6 +211,7 @@ export function useBooks() {
     books,
     loading,
     error,
+    setBooks,
 
     // Actions
     loadBooks,
