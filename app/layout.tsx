@@ -1,16 +1,18 @@
 import { AuthProvider } from "@/lib/auth-context";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import type React from "react";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const IBM = IBM_Plex_Sans_Arabic({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
+});
 
 export const metadata: Metadata = {
   title: "ReadTracker - Track Your Reading Progress",
   description:
     "A clean, minimal reading tracker app to monitor your reading progress",
-  generator: "v0.dev",
 };
 
 export default function RootLayout({
@@ -20,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={IBM.className}>
         <AuthProvider>
           <main className="min-h-screen bg-gray-50">{children}</main>
         </AuthProvider>
