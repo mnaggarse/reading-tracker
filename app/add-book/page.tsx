@@ -1,86 +1,97 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Search, BookOpen, Plus } from "lucide-react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
+import { ProtectedRoute } from "@/components/protected-route";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BookOpen, Plus, Search } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface GoogleBook {
-  id: string
+  id: string;
   volumeInfo: {
-    title: string
-    authors?: string[]
+    title: string;
+    authors?: string[];
     imageLinks?: {
-      thumbnail: string
-    }
-    pageCount?: number
-    description?: string
-  }
+      thumbnail: string;
+    };
+    pageCount?: number;
+    description?: string;
+  };
 }
 
-export default function AddBookPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [searchResults, setSearchResults] = useState<GoogleBook[]>([])
-  const [isSearching, setIsSearching] = useState(false)
+function AddBookContent() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<GoogleBook[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [manualBook, setManualBook] = useState({
     title: "",
     author: "",
     totalPages: "",
     cover: "",
-  })
-  const router = useRouter()
+  });
+  const router = useRouter();
 
   const searchBooks = async () => {
-    if (!searchQuery.trim()) return
+    if (!searchQuery.trim()) return;
 
-    setIsSearching(true)
+    setIsSearching(true);
     try {
       const response = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(searchQuery)}&maxResults=20`,
-      )
-      const data = await response.json()
-      setSearchResults(data.items || [])
+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
+          searchQuery
+        )}&maxResults=20`
+      );
+      const data = await response.json();
+      setSearchResults(data.items || []);
     } catch (error) {
-      console.error("Error searching books:", error)
-      setSearchResults([])
+      console.error("Error searching books:", error);
+      setSearchResults([]);
     } finally {
-      setIsSearching(false)
+      setIsSearching(false);
     }
-  }
+  };
 
   const addBookFromSearch = (book: GoogleBook) => {
     // In a real app, you would save this to your database
-    console.log("Adding book from search:", book)
-    alert(`Added "${book.volumeInfo.title}" to your reading list!`)
-    router.push("/")
-  }
+    console.log("Adding book from search:", book);
+    alert(`Added "${book.volumeInfo.title}" to your reading list!`);
+    router.push("/dashboard");
+  };
 
   const addManualBook = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!manualBook.title || !manualBook.totalPages) {
-      alert("Please fill in at least the title and total pages")
-      return
+      alert("Please fill in at least the title and total pages");
+      return;
     }
 
     // In a real app, you would save this to your database
-    console.log("Adding manual book:", manualBook)
-    alert(`Added "${manualBook.title}" to your reading list!`)
-    router.push("/")
-  }
+    console.log("Adding manual book:", manualBook);
+    alert(`Added "${manualBook.title}" to your reading list!`);
+    router.push("/dashboard");
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Add New Book</h1>
-          <p className="text-gray-600 mt-1">Search for books or add them manually</p>
+          <p className="text-gray-600 mt-1">
+            Search for books or add them manually
+          </p>
         </div>
 
         <Tabs defaultValue="search" className="w-full">
@@ -96,7 +107,9 @@ export default function AddBookPage() {
                   <Search className="h-5 w-5" />
                   Search Google Books
                 </CardTitle>
-                <CardDescription>Search for books from Google's extensive library</CardDescription>
+                <CardDescription>
+                  Search for books from Google's extensive library
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex gap-2">
@@ -117,7 +130,10 @@ export default function AddBookPage() {
             {searchResults.length > 0 && (
               <div className="grid gap-4">
                 {searchResults.map((book) => (
-                  <Card key={book.id} className="hover:shadow-md transition-shadow">
+                  <Card
+                    key={book.id}
+                    className="hover:shadow-md transition-shadow"
+                  >
                     <CardContent className="p-4">
                       <div className="flex gap-4">
                         <div className="flex-shrink-0">
@@ -133,15 +149,23 @@ export default function AddBookPage() {
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-lg mb-1 truncate">{book.volumeInfo.title}</h3>
+                          <h3 className="font-semibold text-lg mb-1 truncate">
+                            {book.volumeInfo.title}
+                          </h3>
                           {book.volumeInfo.authors && (
-                            <p className="text-gray-600 mb-2">by {book.volumeInfo.authors.join(", ")}</p>
+                            <p className="text-gray-600 mb-2">
+                              by {book.volumeInfo.authors.join(", ")}
+                            </p>
                           )}
                           {book.volumeInfo.pageCount && (
-                            <p className="text-sm text-gray-500 mb-2">{book.volumeInfo.pageCount} pages</p>
+                            <p className="text-sm text-gray-500 mb-2">
+                              {book.volumeInfo.pageCount} pages
+                            </p>
                           )}
                           {book.volumeInfo.description && (
-                            <p className="text-sm text-gray-600 line-clamp-2 mb-3">{book.volumeInfo.description}</p>
+                            <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                              {book.volumeInfo.description}
+                            </p>
                           )}
                           <Button
                             onClick={() => addBookFromSearch(book)}
@@ -167,7 +191,9 @@ export default function AddBookPage() {
                   <BookOpen className="h-5 w-5" />
                   Add Book Manually
                 </CardTitle>
-                <CardDescription>Enter book details manually if you can't find it in search</CardDescription>
+                <CardDescription>
+                  Enter book details manually if you can't find it in search
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={addManualBook} className="space-y-4">
@@ -178,7 +204,12 @@ export default function AddBookPage() {
                         id="title"
                         placeholder="Enter book title"
                         value={manualBook.title}
-                        onChange={(e) => setManualBook({ ...manualBook, title: e.target.value })}
+                        onChange={(e) =>
+                          setManualBook({
+                            ...manualBook,
+                            title: e.target.value,
+                          })
+                        }
                         required
                       />
                     </div>
@@ -188,7 +219,12 @@ export default function AddBookPage() {
                         id="author"
                         placeholder="Enter author name"
                         value={manualBook.author}
-                        onChange={(e) => setManualBook({ ...manualBook, author: e.target.value })}
+                        onChange={(e) =>
+                          setManualBook({
+                            ...manualBook,
+                            author: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </div>
@@ -202,7 +238,12 @@ export default function AddBookPage() {
                         min="1"
                         placeholder="Enter total pages"
                         value={manualBook.totalPages}
-                        onChange={(e) => setManualBook({ ...manualBook, totalPages: e.target.value })}
+                        onChange={(e) =>
+                          setManualBook({
+                            ...manualBook,
+                            totalPages: e.target.value,
+                          })
+                        }
                         required
                       />
                     </div>
@@ -212,17 +253,29 @@ export default function AddBookPage() {
                         id="cover"
                         placeholder="Enter cover image URL (optional)"
                         value={manualBook.cover}
-                        onChange={(e) => setManualBook({ ...manualBook, cover: e.target.value })}
+                        onChange={(e) =>
+                          setManualBook({
+                            ...manualBook,
+                            cover: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </div>
 
                   <div className="flex gap-2 pt-4">
-                    <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                    <Button
+                      type="submit"
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
                       <Plus className="h-4 w-4 mr-1" />
                       Add Book
                     </Button>
-                    <Button type="button" variant="outline" onClick={() => router.push("/")}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => router.push("/dashboard")}
+                    >
                       Cancel
                     </Button>
                   </div>
@@ -233,5 +286,13 @@ export default function AddBookPage() {
         </Tabs>
       </div>
     </div>
-  )
+  );
+}
+
+export default function AddBookPage() {
+  return (
+    <ProtectedRoute>
+      <AddBookContent />
+    </ProtectedRoute>
+  );
 }

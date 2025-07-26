@@ -1,32 +1,49 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { BookOpen, Target, TrendingUp, Calendar } from "lucide-react"
+import { ProtectedRoute } from "@/components/protected-route";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useAuth } from "@/lib/auth-context";
+import { BookOpen, Calendar, Target, TrendingUp } from "lucide-react";
+import { useEffect, useState } from "react";
 
-export default function ProfilePage() {
+function ProfileContent() {
+  const { user } = useAuth();
   const [userStats, setUserStats] = useState({
-    name: "John Doe",
-    email: "john@example.com",
+    name: "User",
+    email: "",
     totalBooksRead: 12,
     totalPagesRead: 3420,
     currentlyReading: 3,
     averagePagesPerDay: 15,
     readingStreak: 7,
     joinDate: "January 2024",
-  })
+  });
 
   useEffect(() => {
-    // Load user data from localStorage (mock data)
-    const userName = localStorage.getItem("userName") || "John Doe"
-    const userEmail = localStorage.getItem("userEmail") || "john@example.com"
-    setUserStats((prev) => ({
-      ...prev,
-      name: userName,
-      email: userEmail,
-    }))
-  }, [])
+    if (user) {
+      const userName =
+        user.user_metadata?.name || user.email?.split("@")[0] || "User";
+      const userEmail = user.email || "";
+      const joinDate = new Date(user.created_at).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+      });
+
+      setUserStats((prev) => ({
+        ...prev,
+        name: userName,
+        email: userEmail,
+        joinDate: joinDate,
+      }));
+    }
+  }, [user]);
 
   const statCards = [
     {
@@ -57,7 +74,7 @@ export default function ProfilePage() {
       description: "Consecutive reading days",
       color: "text-purple-600",
     },
-  ]
+  ];
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -66,10 +83,12 @@ export default function ProfilePage() {
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-              {userStats.name.charAt(0)}
+              {userStats.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{userStats.name}</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {userStats.name}
+              </h1>
               <p className="text-gray-600">{userStats.email}</p>
               <Badge variant="secondary" className="mt-1">
                 Member since {userStats.joinDate}
@@ -83,7 +102,9 @@ export default function ProfilePage() {
           {statCards.map((stat, index) => (
             <Card key={index}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">{stat.title}</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-600">
+                  {stat.title}
+                </CardTitle>
                 <stat.icon className={`h-4 w-4 ${stat.color}`} />
               </CardHeader>
               <CardContent>
@@ -98,7 +119,9 @@ export default function ProfilePage() {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>Reading Goals</CardTitle>
-            <CardDescription>Your progress towards this year's reading goals</CardDescription>
+            <CardDescription>
+              Your progress towards this year's reading goals
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -110,7 +133,9 @@ export default function ProfilePage() {
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${(userStats.totalBooksRead / 24) * 100}%` }}
+                    style={{
+                      width: `${(userStats.totalBooksRead / 24) * 100}%`,
+                    }}
                   ></div>
                 </div>
               </div>
@@ -122,7 +147,9 @@ export default function ProfilePage() {
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-green-600 h-2 rounded-full"
-                    style={{ width: `${(userStats.averagePagesPerDay / 20) * 100}%` }}
+                    style={{
+                      width: `${(userStats.averagePagesPerDay / 20) * 100}%`,
+                    }}
                   ></div>
                 </div>
               </div>
@@ -148,14 +175,18 @@ export default function ProfilePage() {
               <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                 <TrendingUp className="h-5 w-5 text-green-600" />
                 <div>
-                  <p className="font-medium">Updated progress on "The Great Gatsby"</p>
+                  <p className="font-medium">
+                    Updated progress on "The Great Gatsby"
+                  </p>
                   <p className="text-sm text-gray-600">3 days ago</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                 <Target className="h-5 w-5 text-orange-600" />
                 <div>
-                  <p className="font-medium">Started reading "Pride and Prejudice"</p>
+                  <p className="font-medium">
+                    Started reading "Pride and Prejudice"
+                  </p>
                   <p className="text-sm text-gray-600">1 week ago</p>
                 </div>
               </div>
@@ -164,5 +195,13 @@ export default function ProfilePage() {
         </Card>
       </div>
     </div>
-  )
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <ProtectedRoute>
+      <ProfileContent />
+    </ProtectedRoute>
+  );
 }
