@@ -198,7 +198,7 @@ function AddBookContent() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex gap-3">
+                    <div className="flex flex-col md:flex-row gap-3">
                       <Input
                         placeholder="Enter book title, author, or ISBN..."
                         value={searchQuery}
@@ -214,12 +214,12 @@ function AddBookContent() {
                       >
                         {isSearching ? (
                           <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            <Loader2 className="h-4 w-4 animate-spin" />
                             Searching...
                           </>
                         ) : (
                           <>
-                            <Search className="h-4 w-4 mr-2" />
+                            <Search className="h-4 w-4" />
                             Search
                           </>
                         )}
