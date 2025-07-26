@@ -41,6 +41,8 @@ function AddBookContent() {
   const [searchResults, setSearchResults] = useState<GoogleBook[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [addingBookId, setAddingBookId] = useState<string | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
   const [manualBook, setManualBook] = useState({
     title: "",
     author: "",
@@ -55,6 +57,7 @@ function AddBookContent() {
 
     setIsSearching(true);
     setSearchResults([]);
+    setHasSearched(true);
     try {
       const response = await fetch(
         `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
@@ -78,6 +81,7 @@ function AddBookContent() {
   };
 
   const addBookFromSearch = async (book: GoogleBook) => {
+    setAddingBookId(book.id);
     setIsAdding(true);
 
     // Test database connection first
@@ -85,12 +89,14 @@ function AddBookContent() {
     if (!dbConnected) {
       console.error("Database connection failed");
       setIsAdding(false);
+      setAddingBookId(null);
       return;
     }
 
     // Add a timeout to prevent infinite loading
     const timeoutId = setTimeout(() => {
       setIsAdding(false);
+      setAddingBookId(null);
       console.error("Add book operation timed out");
     }, 10000); // 10 second timeout
 
@@ -115,6 +121,7 @@ function AddBookContent() {
       console.error("Error adding book:", error);
     } finally {
       setIsAdding(false);
+      setAddingBookId(null);
     }
   };
 
@@ -257,7 +264,22 @@ function AddBookContent() {
                 </div>
               )}
 
-              {!isSearching && searchQuery && searchResults.length === 0 && (
+              {!isSearching && !hasSearched && (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Search className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Search for books
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Enter a book title, author, or ISBN above to find books to
+                    add to your library
+                  </p>
+                </div>
+              )}
+
+              {!isSearching && hasSearched && searchResults.length === 0 && (
                 <div className="text-center py-12">
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <BookOpen className="h-8 w-8 text-gray-400" />
@@ -300,10 +322,10 @@ function AddBookContent() {
                     {searchResults.map((book) => (
                       <Card
                         key={book.id}
-                        className="hover:shadow-lg transition-all duration-200 border border-gray-200 rounded-xl overflow-hidden group"
+                        className="hover:shadow-lg transition-all duration-200 border border-gray-200 rounded-xl overflow-hidden group flex flex-col h-full"
                       >
-                        <CardContent className="p-6">
-                          <div className="flex flex-col">
+                        <CardContent className="p-6 flex flex-col h-full">
+                          <div className="flex flex-col h-full">
                             <div className="flex-shrink-0 mb-4">
                               <div className="relative mx-auto">
                                 <Image
@@ -324,7 +346,7 @@ function AddBookContent() {
                               </div>
                             </div>
 
-                            <div className="flex-1 min-w-0 text-center">
+                            <div className="flex-1 min-w-0 text-center flex flex-col">
                               <div className="mb-4">
                                 <h3 className="font-bold text-lg mb-2 text-gray-900 line-clamp-2">
                                   {book.volumeInfo.title}
@@ -347,7 +369,7 @@ function AddBookContent() {
                               </div>
 
                               {book.volumeInfo.description && (
-                                <div className="mb-4">
+                                <div className="mb-4 flex-1">
                                   <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
                                     {book.volumeInfo.description.replace(
                                       /<[^>]*>/g,
@@ -357,24 +379,26 @@ function AddBookContent() {
                                 </div>
                               )}
 
-                              <Button
-                                onClick={() => addBookFromSearch(book)}
-                                size="sm"
-                                className="bg-blue-600 hover:bg-blue-700 rounded-xl px-6 py-2 h-auto font-medium w-full"
-                                disabled={isAdding}
-                              >
-                                {isAdding ? (
-                                  <>
-                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                    Adding to Library...
-                                  </>
-                                ) : (
-                                  <>
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Add to Library
-                                  </>
-                                )}
-                              </Button>
+                              <div className="mt-auto pt-4">
+                                <Button
+                                  onClick={() => addBookFromSearch(book)}
+                                  size="sm"
+                                  className="bg-blue-600 hover:bg-blue-700 rounded-xl px-6 py-2 h-auto font-medium w-full"
+                                  disabled={addingBookId === book.id}
+                                >
+                                  {addingBookId === book.id ? (
+                                    <>
+                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                      Adding to Library...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Plus className="h-4 w-4 mr-2" />
+                                      Add to Library
+                                    </>
+                                  )}
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         </CardContent>
