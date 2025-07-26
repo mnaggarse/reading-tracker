@@ -79,7 +79,9 @@ function AddBookContent() {
     try {
       const newBook = await addBook({
         title: book.volumeInfo.title,
-        cover: book.volumeInfo.imageLinks?.thumbnail || "/placeholder.svg",
+        cover:
+          book.volumeInfo.imageLinks?.thumbnail ||
+          "https://placehold.co/200x300?text=Cover",
         pages: book.volumeInfo.pageCount || 1,
         read: 0,
       });
@@ -111,7 +113,8 @@ function AddBookContent() {
     try {
       const newBook = await addBook({
         title: manualBook.title.trim(),
-        cover: manualBook.cover.trim() || "/placeholder.svg",
+        cover:
+          manualBook.cover.trim() || "https://placehold.co/200x300?text=Cover",
         pages: manualBook.pages ? parseInt(manualBook.pages) : 1,
         read: 0,
       });
@@ -275,7 +278,7 @@ function AddBookContent() {
                                 <Image
                                   src={
                                     book.volumeInfo.imageLinks?.thumbnail ||
-                                    "/placeholder.svg"
+                                    "https://placehold.co/200x300?text=Cover"
                                   }
                                   alt={book.volumeInfo.title}
                                   width={120}
