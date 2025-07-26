@@ -381,7 +381,7 @@ function AddBookContent() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-2 col-span-2">
+                      <div className="space-y-2 md:col-span-2">
                         <Label htmlFor="cover">Cover Image URL</Label>
                         <Input
                           id="cover"
@@ -396,7 +396,7 @@ function AddBookContent() {
                           disabled={isAdding}
                         />
                       </div>
-                      <div className="space-y-2 col-span-1">
+                      <div className="space-y-2 md:col-span-1">
                         <Label htmlFor="pages">Total Pages</Label>
                         <Input
                           id="pages"
@@ -415,7 +415,15 @@ function AddBookContent() {
                       </div>
                     </div>
 
-                    <div className="flex gap-2 pt-4">
+                    <div className="flex gap-2 pt-4 justify-between">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => router.push("/dashboard")}
+                        disabled={isAdding}
+                      >
+                        Cancel
+                      </Button>
                       <Button
                         type="submit"
                         className="bg-blue-600 hover:bg-blue-700"
@@ -432,14 +440,6 @@ function AddBookContent() {
                             Add Book
                           </>
                         )}
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => router.push("/dashboard")}
-                        disabled={isAdding}
-                      >
-                        Cancel
                       </Button>
                     </div>
                   </form>
