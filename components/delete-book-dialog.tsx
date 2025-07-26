@@ -6,7 +6,6 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
@@ -36,7 +35,7 @@ export function DeleteBookDialog({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent className="rounded-2xl">
+      <AlertDialogContent className="sm:max-w-md max-w-[90vw] rounded-2xl">
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Book</AlertDialogTitle>
           <AlertDialogDescription>
@@ -44,7 +43,7 @@ export function DeleteBookDialog({
             be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
+        <div className="flex justify-between items-center">
           <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
@@ -52,7 +51,7 @@ export function DeleteBookDialog({
           >
             Delete
           </AlertDialogAction>
-        </AlertDialogFooter>
+        </div>
       </AlertDialogContent>
     </AlertDialog>
   );

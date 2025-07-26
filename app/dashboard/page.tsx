@@ -70,7 +70,14 @@ function DashboardContent() {
     bookId: string,
     updates: { title: string; cover: string; pages: number; rating: number }
   ) => {
-    await updateBook(bookId, updates);
+    // Find the current book to check if we need to reset read pages
+    const currentBook = books.find((book) => book.id === bookId);
+    if (currentBook && updates.pages < currentBook.read) {
+      // Reset read pages to 0 when total pages is reduced
+      await updateBook(bookId, { ...updates, read: 0 });
+    } else {
+      await updateBook(bookId, updates);
+    }
   };
 
   const handleDeleteConfirm = async (bookId: string) => {
@@ -112,8 +119,8 @@ function DashboardContent() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-8">
-          <p className="text-gray-500">{emptyMessage}</p>
+        <div className="text-center py-4">
+          <p className="w-[80%] mx-auto text-gray-500">{emptyMessage}</p>
         </div>
       )}
     </div>
@@ -230,13 +237,7 @@ function DashboardContent() {
         ) : (
           <>
             <BookSection
-              title="Completed"
-              books={completedBooksList}
-              emptyMessage="No books completed yet. Keep reading to see your achievements here!"
-            />
-
-            <BookSection
-              title="In Progress"
+              title="Currently Reading"
               books={inProgressBooksList}
               emptyMessage="No books in progress. Start reading to see your progress here!"
             />
@@ -245,6 +246,12 @@ function DashboardContent() {
               title="To Read"
               books={unreadBooksList}
               emptyMessage="No books waiting to be read. Add some books to your reading list!"
+            />
+
+            <BookSection
+              title="Completed"
+              books={completedBooksList}
+              emptyMessage="No books completed yet. Keep reading to see your achievements here!"
             />
           </>
         )}

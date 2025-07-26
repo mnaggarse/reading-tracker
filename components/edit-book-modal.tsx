@@ -1,11 +1,19 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -36,6 +44,8 @@ export function EditBookModal({
     pages: "",
     rating: "",
   });
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState(false);
 
   useEffect(() => {
     if (book) {
@@ -51,71 +61,75 @@ export function EditBookModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (book) {
+      const newPages = parseInt(formData.pages) || 1;
+      const currentRead = book.read;
+
+      // Check if new pages is less than current read pages
+      if (newPages < currentRead) {
+        setShowConfirmation(true);
+        setPendingSubmit(true);
+        return;
+      }
+
+      // Proceed with normal save
       onSave(book.id, {
         title: formData.title,
         cover: formData.cover || "/placeholder.svg",
-        pages: parseInt(formData.pages) || 1,
+        pages: newPages,
         rating: parseInt(formData.rating) || 0,
       });
       onClose();
     }
   };
 
+  const handleConfirmPagesChange = () => {
+    if (book && pendingSubmit) {
+      onSave(book.id, {
+        title: formData.title,
+        cover: formData.cover || "/placeholder.svg",
+        pages: parseInt(formData.pages) || 1,
+        rating: parseInt(formData.rating) || 0,
+      });
+      setShowConfirmation(false);
+      setPendingSubmit(false);
+      onClose();
+    }
+  };
+
+  const handleCancelPagesChange = () => {
+    setShowConfirmation(false);
+    setPendingSubmit(false);
+  };
+
   const handleClose = () => {
     onClose();
     setFormData({ title: "", cover: "", pages: "", rating: "" });
+    setShowConfirmation(false);
+    setPendingSubmit(false);
   };
 
   if (!book) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md max-w-[90vw] rounded-2xl">
-        <DialogHeader>
-          <DialogTitle>Edit Book</DialogTitle>
-          <DialogDescription>
-            Update the details for "{book.title}"
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-md max-w-[90vw] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Book</DialogTitle>
+            <DialogDescription>
+              Update the details for "{book.title}"
+            </DialogDescription>
+          </DialogHeader>
 
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Book Title</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                required
-                className="rounded-xl"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="cover">Cover Image URL</Label>
-              <Input
-                id="cover"
-                value={formData.cover}
-                onChange={(e) =>
-                  setFormData({ ...formData, cover: e.target.value })
-                }
-                placeholder="Enter cover image URL"
-                className="rounded-xl"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="pages">Total Pages</Label>
+                <Label htmlFor="title">Book Title</Label>
                 <Input
-                  id="pages"
-                  type="number"
-                  min="1"
-                  value={formData.pages}
+                  id="title"
+                  value={formData.title}
                   onChange={(e) =>
-                    setFormData({ ...formData, pages: e.target.value })
+                    setFormData({ ...formData, title: e.target.value })
                   }
                   required
                   className="rounded-xl"
@@ -123,41 +137,98 @@ export function EditBookModal({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="rating">Rating (1-5)</Label>
+                <Label htmlFor="cover">Cover Image URL</Label>
                 <Input
-                  id="rating"
-                  type="number"
-                  min="0"
-                  max="5"
-                  value={formData.rating}
+                  id="cover"
+                  value={formData.cover}
                   onChange={(e) =>
-                    setFormData({ ...formData, rating: e.target.value })
+                    setFormData({ ...formData, cover: e.target.value })
                   }
-                  placeholder="0-5"
+                  placeholder="Enter cover image URL"
                   className="rounded-xl"
                 />
               </div>
-            </div>
-          </div>
 
-          <DialogFooter className="gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              className="rounded-xl bg-transparent"
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="pages">Total Pages</Label>
+                  <Input
+                    id="pages"
+                    type="number"
+                    min="1"
+                    value={formData.pages}
+                    onChange={(e) =>
+                      setFormData({ ...formData, pages: e.target.value })
+                    }
+                    required
+                    className="rounded-xl"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="rating">Rating (1-5)</Label>
+                  <Input
+                    id="rating"
+                    type="number"
+                    min="0"
+                    max="5"
+                    value={formData.rating}
+                    onChange={(e) =>
+                      setFormData({ ...formData, rating: e.target.value })
+                    }
+                    placeholder="0-5"
+                    className="rounded-xl"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center mt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleClose}
+                className="rounded-xl bg-transparent"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 rounded-xl"
+              >
+                Save Changes
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+        <AlertDialogContent className="sm:max-w-md max-w-[90vw] rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset Reading Progress?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You're setting the total pages to {formData.pages}, but you've
+              already read {book.read} pages. This will reset your reading
+              progress to 0 pages. Are you sure you want to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex justify-between items-center mt-4">
+            <AlertDialogCancel
+              onClick={handleCancelPagesChange}
+              className="rounded-xl"
             >
               Cancel
-            </Button>
-            <Button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700 rounded-xl"
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmPagesChange}
+              className="bg-red-600 hover:bg-red-700 rounded-xl"
             >
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+              Reset Progress
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
