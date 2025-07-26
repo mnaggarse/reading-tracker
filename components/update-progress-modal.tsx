@@ -7,12 +7,10 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Book } from "@/lib/database.types";
 import { useEffect, useState } from "react";
 
@@ -65,8 +63,10 @@ export function UpdateProgressModal({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md max-w-[90vw] rounded-2xl">
         <DialogHeader>
-          <DialogTitle>Update Reading Progress</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-center">
+            Update Reading Progress
+          </DialogTitle>
+          <DialogDescription className="text-center">
             Update your progress for "{book.title}"
           </DialogDescription>
         </DialogHeader>
@@ -74,13 +74,12 @@ export function UpdateProgressModal({
         <form onSubmit={handleSubmit}>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="currentPage">Current Page</Label>
-              <div className="flex items-center gap-2">
+              <p className="text-center">Total pages: {book.pages}</p>
+              <div className="flex items-center gap-6">
                 <Button
                   type="button"
                   variant="outline"
-                  size="sm"
-                  className="h-10 w-10 rounded-full bg-blue-50 hover:bg-blue-100 border-blue-200"
+                  className="h-10 w-10 rounded-full bg-gray-100 hover:bg-gray-200 border-gray-200"
                   onClick={() => {
                     const newPage = Math.max(
                       0,
@@ -105,8 +104,7 @@ export function UpdateProgressModal({
                 <Button
                   type="button"
                   variant="outline"
-                  size="sm"
-                  className="h-10 w-10 rounded-full bg-blue-50 hover:bg-blue-100 border-blue-200"
+                  className="h-10 w-10 rounded-full bg-gray-100 hover:bg-gray-200 border-gray-200"
                   onClick={() => {
                     const newPage = Math.min(
                       book.pages,
@@ -120,14 +118,9 @@ export function UpdateProgressModal({
                 </Button>
               </div>
             </div>
-
-            <div className="text-sm text-gray-600">
-              <p>Total pages: {book.pages}</p>
-              {currentPage && <p>Progress: {Math.round(currentProgress)}%</p>}
-            </div>
           </div>
 
-          <DialogFooter className="gap-2">
+          <div className="flex justify-between gap-2 mt-8">
             <Button
               type="button"
               variant="outline"
@@ -142,7 +135,7 @@ export function UpdateProgressModal({
             >
               Update Progress
             </Button>
-          </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

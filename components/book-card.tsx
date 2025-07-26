@@ -28,18 +28,20 @@ export function BookCard({ book, onClick, onEdit, onDelete }: BookCardProps) {
     <ContextMenu>
       <ContextMenuTrigger>
         <Card
-          className="hover:shadow-lg transition-shadow duration-200 group rounded-xl cursor-pointer"
+          className="hover:shadow-lg transition-shadow duration-200 group rounded-xl cursor-pointer h-80"
           onClick={onClick}
         >
-          <CardContent className="p-4">
-            <div className="relative mb-4">
-              <Image
-                src={book.cover || "/placeholder.svg"}
-                alt={book.title}
-                width={200}
-                height={300}
-                className="w-full h-48 object-cover rounded-md group-hover:scale-105 transition-transform duration-200"
-              />
+          <CardContent className="p-4 h-full flex flex-col">
+            <div className="relative mb-4 flex-shrink-0">
+              <div className="w-full h-48 bg-gray-100 rounded-md overflow-hidden">
+                <Image
+                  src={book.cover || "/placeholder.svg"}
+                  alt={book.title}
+                  width={200}
+                  height={300}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                />
+              </div>
               {isCompleted && (
                 <div className="absolute top-2 right-2">
                   <CheckCircle className="h-6 w-6 text-green-600 bg-white rounded-full" />
@@ -47,12 +49,12 @@ export function BookCard({ book, onClick, onEdit, onDelete }: BookCardProps) {
               )}
             </div>
 
-            <div className="space-y-3">
-              <h3 className="font-semibold text-sm leading-tight line-clamp-2 text-center">
+            <div className="flex-1 flex flex-col">
+              <h3 className="font-semibold text-sm leading-tight line-clamp-2 text-center mb-3 flex-shrink-0">
                 {book.title}
               </h3>
 
-              <div>
+              <div className="mt-auto">
                 {/* Progress Bar and Percentage */}
                 {book.pages > 0 && (
                   <div className="flex items-center gap-2">
@@ -74,16 +76,13 @@ export function BookCard({ book, onClick, onEdit, onDelete }: BookCardProps) {
           </CardContent>
         </Card>
       </ContextMenuTrigger>
-      <ContextMenuContent className="rounded-xl">
-        <ContextMenuItem onClick={onEdit} className="cursor-pointer">
+      <ContextMenuContent>
+        <ContextMenuItem onClick={onEdit}>
           <Edit className="mr-2 h-4 w-4" />
           Edit Book
         </ContextMenuItem>
         <ContextMenuSeparator />
-        <ContextMenuItem
-          onClick={onDelete}
-          className="text-red-600 cursor-pointer"
-        >
+        <ContextMenuItem onClick={onDelete} className="text-red-600">
           <Trash2 className="mr-2 h-4 w-4" />
           Delete Book
         </ContextMenuItem>
