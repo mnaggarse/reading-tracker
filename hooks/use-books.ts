@@ -99,6 +99,24 @@ export function useBooks() {
     }
   };
 
+  // Delete all books for the current user
+  const deleteAllBooks = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Get all book IDs for the user
+      const bookIds = books.map((book) => book.id);
+      for (const id of bookIds) {
+        await bookService.deleteBook(id);
+      }
+      await loadBooks();
+    } catch (err: any) {
+      setError(err.message || "Failed to delete all books");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Toggle read status
   const toggleReadStatus = async (bookId: string) => {
     const book = books.find((b) => b.id === bookId);
@@ -155,6 +173,7 @@ export function useBooks() {
     addBook,
     updateBook,
     deleteBook,
+    deleteAllBooks,
     toggleReadStatus,
 
     // Computed values

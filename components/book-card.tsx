@@ -34,25 +34,25 @@ export function BookCard({ book, onClick, onEdit, onDelete }: BookCardProps) {
           <CardContent className="p-4 h-full flex flex-col">
             <div className="relative mb-4 flex-shrink-0">
               <div className="w-full h-48 bg-gray-100 rounded-md overflow-hidden">
-                <Image
-                  src={book.cover || "/placeholder.svg"}
-                  alt={book.title}
-                  width={200}
-                  height={300}
+          <Image
+            src={book.cover || "/placeholder.svg"}
+            alt={book.title}
+            width={200}
+            height={300}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                />
+          />
               </div>
               {isCompleted && (
-                <div className="absolute top-2 right-2">
-                  <CheckCircle className="h-6 w-6 text-green-600 bg-white rounded-full" />
-                </div>
-              )}
+            <div className="absolute top-2 right-2">
+              <CheckCircle className="h-6 w-6 text-green-600 bg-white rounded-full" />
             </div>
+          )}
+        </div>
 
             <div className="flex-1 flex flex-col">
               <h3 className="font-semibold text-sm leading-tight line-clamp-2 text-center mb-3 flex-shrink-0">
-                {book.title}
-              </h3>
+            {book.title}
+          </h3>
 
               <div className="mt-auto">
                 {/* Progress Bar and Percentage */}
@@ -69,12 +69,12 @@ export function BookCard({ book, onClick, onEdit, onDelete }: BookCardProps) {
                     <span className="text-xs text-gray-600 font-medium text-right">
                       {Math.floor(progress)}%
                     </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                </div>
+              )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuItem onClick={onEdit}>

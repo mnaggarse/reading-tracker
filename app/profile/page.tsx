@@ -2,6 +2,17 @@
 
 import { ProtectedRoute } from "@/components/protected-route";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -15,7 +26,9 @@ import { useEffect, useState } from "react";
 
 function ProfileContent() {
   const { user } = useAuth();
-  const { books } = useBooks();
+  const { books, deleteAllBooks } = useBooks();
+  const { signOut } = useAuth();
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
   const [userStats, setUserStats] = useState({
     name: "User",
@@ -192,6 +205,57 @@ function ProfileContent() {
                   ></div>
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Account Actions */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Account Actions</CardTitle>
+            <CardDescription>Manage your account and data</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-4">
+              <Button
+                variant="outline"
+                onClick={signOut}
+                className="rounded-xl"
+              >
+                Logout
+              </Button>
+              <AlertDialog
+                open={resetDialogOpen}
+                onOpenChange={setResetDialogOpen}
+              >
+                <AlertDialogContent className="rounded-2xl">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Reset All Data</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to delete all your books? This
+                      action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className="flex justify-between">
+                    <AlertDialogCancel className="rounded-xl">
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={deleteAllBooks}
+                      className="bg-red-600 hover:bg-red-700 rounded-xl"
+                    >
+                      Reset Data
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+                <Button
+                  variant="destructive"
+                  onClick={() => setResetDialogOpen(true)}
+                  className="rounded-xl"
+                >
+                  Reset Data
+                </Button>
+              </AlertDialog>
             </div>
           </CardContent>
         </Card>
