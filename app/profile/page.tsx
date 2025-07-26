@@ -1,7 +1,6 @@
 "use client";
 
 import { ProtectedRoute } from "@/components/protected-route";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -109,9 +108,6 @@ function ProfileContent() {
                 {userStats.name}
               </h1>
               <p className="text-gray-600">{userStats.email}</p>
-              <Badge variant="secondary" className="mt-1">
-                Member since {userStats.joinDate}
-              </Badge>
             </div>
           </div>
         </div>
