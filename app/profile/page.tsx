@@ -118,7 +118,7 @@ function ProfileContent() {
         {/* Profile Header */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+            <div className="select-none w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
               {userStats.name.charAt(0).toUpperCase()}
             </div>
             <div>
