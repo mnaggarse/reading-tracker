@@ -10,7 +10,7 @@ const IBM = IBM_Plex_Sans_Arabic({
 });
 
 export const metadata: Metadata = {
-  title: "ReadTracker - Track Your Reading Progress",
+  title: "ReadTracker",
   description:
     "A clean, minimal reading tracker app to monitor your reading progress",
 };

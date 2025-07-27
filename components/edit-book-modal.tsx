@@ -128,6 +128,7 @@ export function EditBookModal({
                     setFormData({ ...formData, title: e.target.value })
                   }
                   required
+                  dir="auto"
                   className="rounded-xl"
                 />
               </div>

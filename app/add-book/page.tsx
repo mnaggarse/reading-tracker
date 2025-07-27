@@ -192,6 +192,7 @@ function AddBookContent() {
                         onKeyPress={(e) => e.key === "Enter" && searchBooks()}
                         className="flex-1 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                         disabled={isSearching}
+                        dir="auto"
                       />
                       <Button
                         onClick={searchBooks}
@@ -372,6 +373,7 @@ function AddBookContent() {
                         id="title"
                         placeholder="Enter book title"
                         value={manualBook.title}
+                        dir="auto"
                         onChange={(e) =>
                           setManualBook({
                             ...manualBook,
