@@ -3,14 +3,14 @@
 import { BookCard } from "@/components/book-card";
 import { DeleteBookDialog } from "@/components/delete-book-dialog";
 import { EditBookModal } from "@/components/edit-book-modal";
-import { MobileNav } from "@/components/mobile-nav";
+import { Navbar } from "@/components/navbar";
 import { ProtectedRoute } from "@/components/protected-route";
 import { Button } from "@/components/ui/button";
 import { UpdateProgressModal } from "@/components/update-progress-modal";
 import { useBooks } from "@/hooks/use-books";
 import { useAuth } from "@/lib/auth-context";
 import { Book } from "@/lib/database.types";
-import { BookOpen, Loader2, Plus, User } from "lucide-react";
+import { BookOpen, Loader2, Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -148,39 +148,7 @@ function DashboardContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="border-b bg-white">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <Link
-              href="/"
-              className="flex items-center gap-2 font-semibold text-xl text-blue-600"
-            >
-              <BookOpen className="h-6 w-6 text-blue-600" />
-              ReadTracker
-            </Link>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-4">
-              <Button asChild variant="ghost" size="sm" className="gap-2">
-                <Link href="/profile">
-                  <User className="h-4 w-4" />
-                  Profile
-                </Link>
-              </Button>
-              <Button asChild className="font-bold gap-2 bg-blue-600 hover:bg-blue-700">
-                <Link href="/add-book">
-                  <Plus className="h-4 w-4" />
-                  Add Book
-                </Link>
-              </Button>
-            </div>
-
-            {/* Mobile Navigation */}
-            <MobileNav />
-          </div>
-        </div>
-      </nav>
+      <Navbar showAddBook={true} showProfile={true} />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">

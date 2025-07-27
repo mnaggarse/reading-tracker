@@ -19,12 +19,38 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function HomePage() {
-  const { user, signInWithGoogle } = useAuth();
+  const { user, signInWithGoogle, loading } = useAuth();
+  const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (!loading && user) {
+      router.push("/dashboard");
+    }
+  }, [user, loading, router]);
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render the home page content if user is authenticated (will redirect)
+  if (user) {
+    return null;
+  }
 
   const features = [
     {
@@ -69,40 +95,28 @@ export default function HomePage() {
               grows with you.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {user ? (
-                <Link href="/dashboard">
-                  <Button
-                    size="lg"
-                    className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3"
-                  >
-                    Go to Dashboard
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-              ) : (
-                <Button
-                  size="lg"
-                  className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3"
-                  onClick={async () => {
-                    setIsSigningIn(true);
-                    await signInWithGoogle();
-                    setIsSigningIn(false);
-                  }}
-                  disabled={isSigningIn}
-                >
-                  {isSigningIn ? (
-                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                  ) : null}
-                  <Image
-                    src="/google.svg"
-                    alt="Google"
-                    width={20}
-                    height={20}
-                    className="mr-2"
-                  />
-                  Continue with Google
-                </Button>
-              )}
+              <Button
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3"
+                onClick={async () => {
+                  setIsSigningIn(true);
+                  await signInWithGoogle();
+                  setIsSigningIn(false);
+                }}
+                disabled={isSigningIn}
+              >
+                {isSigningIn ? (
+                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                ) : null}
+                <Image
+                  src="/google.svg"
+                  alt="Google"
+                  width={20}
+                  height={20}
+                  className="mr-2"
+                />
+                Continue with Google
+              </Button>
             </div>
           </div>
         </div>

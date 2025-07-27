@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import type React from "react";
 
-import { MobileNav } from "@/components/mobile-nav";
+import { Navbar } from "@/components/navbar";
 import { ProtectedRoute } from "@/components/protected-route";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -135,25 +134,7 @@ function AddBookContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="border-b bg-white">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
-              <Link
-                href="/"
-                className="flex items-center gap-2 font-semibold text-xl text-blue-600"
-              >
-                <BookOpen className="h-6 w-6 text-blue-600" />
-                ReadTracker
-              </Link>
-            </div>
-
-            {/* Mobile Navigation */}
-            <MobileNav />
-          </div>
-        </div>
-      </nav>
+      <Navbar showAddBook={false} showProfile={true} />
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
